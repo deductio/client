@@ -1,9 +1,7 @@
 type Resource = {
     title: string,
     description: string,
-    topic_id: number,
     link: string | null,
-    id: number
 }
 
 type Topic = {

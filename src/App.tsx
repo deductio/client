@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useCallback } from "react"
-import logo from './logo.svg';
 import Graph from "./components/graph/Graph"
 import TopicModal from './components/topic_modal/TopicModal';
 import useSWRImmutable from "swr/immutable"
@@ -30,19 +29,19 @@ function App() {
   const initialResources: Resource[] = [{
     title: "yh",
     description: "uj",
-    topic_id: 0,
-    link: null,
-    id: 1
+    link: null
   }]
 
   const [uuid, setUuid] = useState("00000000-0000-0000-0000-000000000000")
   const [topic, setTopic] = useState(initialTopic)
   const [opened, setOpened] = useState(false)
+  const [resource, setResource] = useState(initialResources)
 
   const { data, isLoading, error } = useSWRImmutable(["http://localhost/graph/" + uuid, uuid], fetcher)
-  const { data: res } = useSWRImmutable(["http://localhost/graph/" + uuid + "/topic/" + topic.id, uuid, topic], fetcher)
 
   const graph: KnowledgeGraph = data as KnowledgeGraph
+
+  console.log(data)
 
   const resRet = useCallback((id: number) => {
     setTopic(graph.topics.filter(topic => topic.id === id)[0])
@@ -58,7 +57,7 @@ function App() {
   return (
     <div className="App">
       { graphMemo }
-      <TopicModal topic={topic} resources={res || initialResources} opened={opened} closeModal={closeModal}></TopicModal>
+      <TopicModal topic={topic} opened={opened} closeModal={closeModal}></TopicModal>
     </div>
   );
 }
