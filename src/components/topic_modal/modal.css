@@ -1,0 +1,10 @@
+.resource-image {
+    height: 7%;
+    border-radius: 10px;
+    margin-right: 20px;
+    width: 7%;
+}
+
+.resource-title-header {
+    margin-top: 0;
+}

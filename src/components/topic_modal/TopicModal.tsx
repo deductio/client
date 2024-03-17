@@ -4,7 +4,6 @@ import remarkMath from "remark-math"
 import Modal from "react-modal"
 import matter, { GrayMatterFile, Input } from "gray-matter"
 import { useMemo } from "react"
-import { Buffer } from "buffer"
 import 'katex/dist/katex.min.css' 
 
 import { Topic, Resource } from "../../api/model"
@@ -28,7 +27,7 @@ const TopicModal = (props: TopicModalProps) => {
             {content}
         </Markdown>
 
-        <h2 style={{ textAlign: "center" }}>Resources</h2>
+        <h2 style={{ textAlign: "center" }}><ul>Resources</ul></h2>
         {resources.map((resource: Resource, i: number) => {
             return <ResourceItem key={i} {...resource}></ResourceItem>
         })}

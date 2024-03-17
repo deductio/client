@@ -2,6 +2,7 @@ type Resource = {
     title: string,
     description: string,
     link: string | null,
+    img: string | null
 }
 
 type Topic = {
