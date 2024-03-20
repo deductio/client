@@ -11,16 +11,16 @@ import ResourceItem from "./ResourceItem"
 
 interface TopicModalProps {
     topic: Topic,
-    opened: boolean,
     closeModal: () => void
 }
 
 
 const TopicModal = (props: TopicModalProps) => {
+
         const { content, data } = useMemo(() => matter(props.topic.content), [props.topic.content])
         const resources: Resource[] = data.resources || []
 
-        return (<Modal isOpen={props.opened} onRequestClose={props.closeModal}>
+        return (<Modal isOpen={true} onRequestClose={props.closeModal}>
         <h1 style={{ textAlign: "center" }}>{props.topic.title}</h1>
 
         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>

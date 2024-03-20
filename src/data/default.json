@@ -1,0 +1,19 @@
+{
+
+    "title": "Welcome to deduct.io!",
+    "description": "Tutorial on how to use deduct.io",
+    "topics": [
+        {
+            "title": "Introduction!",
+            "subject": "Graph theory",
+            "content": "wtfogus?",
+            "knowledge_graph_index": 0,
+            "knowledge_graph_id": "test",
+            "id": 1,
+            "requirements": []
+        }
+    ],
+    "id": "0"
+
+    
+}
