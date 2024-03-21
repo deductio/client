@@ -1,30 +1,16 @@
+import { Dispatch } from "react"
 import { KnowledgeGraph, Topic } from "../../api/model"
+import { GraphReduceAction } from "../../api/graphOps"
 
 interface GraphEditorProps {
     graph: KnowledgeGraph,
-    setGraph: (graph: KnowledgeGraph) => void
+    dispatch: Dispatch<GraphReduceAction>
 }
 
-const addTopic = (graph: KnowledgeGraph, setGraph: (_: KnowledgeGraph) => void) => {
-    const newGraph = { ...graph }
-
-    newGraph.topics.push({ 
-        knowledge_graph_id: graph.id, 
-        knowledge_graph_index: Math.random(), 
-        title: "", 
-        requirements: [],
-        id: Math.random(),
-        subject: "",
-        content: ""
-     })
-     
-     setGraph(newGraph)
-
-}
 
 const GraphEditor = (props: GraphEditorProps) => {
     return (<div>
-        <button onClick={() => addTopic(props.graph, props.setGraph)}>add top</button>
+        <button onClick={() => props.dispatch({ type: "addNode" })}>add top</button>
     </div>)
 }
 
