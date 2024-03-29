@@ -10,6 +10,7 @@ import TopicModal from "../components/topic_modal/TopicModal";
 import SearchBar from "../components/search/SearchBar";
 import { graphReducer } from "../api/graphOps";
 import { produce } from "immer";
+import EditTopicModal from "../components/topic_modal/EditTopicModal";
 
 interface GraphProps {
     graph: KnowledgeGraph
@@ -37,9 +38,7 @@ const Graph = (props: GraphProps) => {
         }
     }
 
-    const modifyTopic = (id: number) => {
-
-    }
+    console.log(selectedTopics)
 
     const closeTopic = () => setOpenTopic(null)
 
@@ -50,11 +49,11 @@ const Graph = (props: GraphProps) => {
             <GraphEditEvents selectTopic={topic => dispatch({
                 type: "selectNode",
                 node: topic
-            })} modifyTopic={modifyTopic}/>
+            })} modifyTopic={openTopic}/>
         </SigmaContainer>
         <GraphEditor graph={graph} dispatch={dispatch} />
         
-        { openedTopic !== null ? <TopicModal topic={openedTopic} closeModal={closeTopic}></TopicModal> : "" }
+        { openedTopic !== null ? <EditTopicModal topic={openedTopic} closeModal={closeTopic}/> : "" }
     </div>
 }
 

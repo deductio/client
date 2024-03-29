@@ -1,3 +1,5 @@
+import reverse from 'graphology-operators/reverse';
+
 import { KnowledgeGraph, Topic } from "./model"
 import { produce } from 'immer';
 
@@ -7,9 +9,7 @@ type GraphReduceAction = {
 } | {
     type: "addNode"
 } | {
-    type: "addEdge",
-    source: number,
-    destination: number
+    type: "addEdge"
 } | {
     type: "removeEdge",
     source: number,
@@ -28,61 +28,64 @@ interface GraphReducerState {
 }
 
 // unfinished!
-const graphReducer = (state: GraphReducerState, action: GraphReduceAction) => {
-    if (action.type === "deleteNode") {
-        return produce(state, draft => {
-            draft.graph.topics = draft.graph.topics
-            .filter(topic => topic.id != action.node)
-            .map(topic => {
-                topic.requirements = topic.requirements.filter(requirement => requirement !== action.node)
-                return topic
-            })
-        })
+const graphReducer = (state: GraphReducerState, action: GraphReduceAction) => 
+    produce(state, draft => {
+        if (action.type === "deleteNode") {
+                draft.graph.topics = draft.graph.topics
+                .filter(topic => topic.id != action.node)
+                .map(topic => {
+                    topic.requirements = topic.requirements.filter(requirement => requirement !== action.node)
+                    return topic
+                })
 
-    } else if (action.type === "removeEdge") {
-        return produce(state, draft => {
-            const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
+        } else if (action.type === "removeEdge") {
 
-            draft.graph.topics[index].requirements = draft.graph.topics[index]
-                .requirements
-                .filter(requirement => requirement != action.source)
-        })
+                const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
 
-    } else if (action.type === "addEdge") {
-        // TODO: cycle detection
+                draft.graph.topics[index].requirements = draft.graph.topics[index]
+                    .requirements
+                    .filter(requirement => requirement != action.source)
 
-        return produce(state, draft => {
-            const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
+        } else if (action.type === "addEdge") {
+            // TODO: cycle detection
 
-            draft.graph.topics[index].requirements.push(action.source)
-        })
-    } else if (action.type === "addNode") {
-        return produce(state, draft => {
-            draft.graph.topics.push({
-                id: Math.random(),
-                knowledge_graph_id: "",
-                knowledge_graph_index: Math.random(),
-                title: "Shine On You Crazy Diamond",
-                requirements: [],
-                content: "",
-                subject: ""
-              })
-        })
-    } else if (action.type === "selectNode") {
-        console.log("oh yeah")
+                if (draft.selectedTopics.length == 2) {
+                    const index = draft.graph.topics.findIndex(topic => topic.id == draft.selectedTopics[1])
 
-        return produce(state, draft => {
-            if (draft.selectedTopics.length < 2) {
+                    draft.graph.topics[index].requirements.push(draft.selectedTopics[0])
+
+                    draft.selectedTopics = []
+                }
+                
+
+        } else if (action.type === "addNode") {
+
+                draft.graph.topics.push({
+                    id: Math.random(),
+                    knowledge_graph_id: "",
+                    knowledge_graph_index: Math.random(),
+                    title: "Shine On You Crazy Diamond",
+                    requirements: [],
+                    content: "",
+                    subject: ""
+                })
+
+        } else if (action.type === "selectNode") {
+            console.log("oh yeah")
+
+            if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
                 draft.selectedTopics.push(action.node)
             }
-        })
-    } else if (action.type === "deselectNode") {
-        return produce(state, draft => {
-            draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
-        })
-    } else { // satisfy the typescript compiler
-        return produce(state, draft => draft)
-    }
-}
+
+        } else if (action.type === "deselectNode") {
+
+                draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
+
+        } else { // satisfy the typescript compiler
+            
+        }
+    })
+
+
 
 export { graphReducer, type GraphReduceAction }

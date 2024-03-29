@@ -11,6 +11,7 @@ interface GraphEditorProps {
 const GraphEditor = (props: GraphEditorProps) => {
     return (<div>
         <button onClick={() => props.dispatch({ type: "addNode" })}>add top</button>
+        <button onClick={() => props.dispatch({ type: "addEdge" })}>add edge</button>
     </div>)
 }
 

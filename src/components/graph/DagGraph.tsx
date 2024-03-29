@@ -20,30 +20,34 @@ const DagGraph = (props: DagGraphProps) => {
         dag.setDefaultEdgeLabel(() => {return {}})
 
         for (const topic of props.graph.topics) {
-            graph.addNode(topic.knowledge_graph_index, { 
+            graph.addNode(topic.id, { 
                 x: 0, 
                 y: 0,
                 label: topic.title,
                 size: 10,
-                color: "blue"
+                color: "blue",
             })
 
-            dag.setNode(String(topic.knowledge_graph_index), {
+            dag.setNode(String(topic.id), {
                 label: topic.title,
                 width: 100,
                 height: 100
             })
+
+            
     
-            graph.setNodeAttribute(topic.knowledge_graph_index, "id", topic.id)
+            graph.setNodeAttribute(topic.id, "id", topic.id)
+
+            console.log(graph, props.graph.topics)
     
             for (const requirement of topic.requirements) {
-                graph.addEdge(requirement, topic.knowledge_graph_index,  { 
+                graph.addEdge(requirement, topic.id,  { 
                     label: "REL_1",
                     type: "arrow",
                     size: 3
                 });
 
-                dag.setEdge(String(requirement), String(topic.knowledge_graph_index))
+                dag.setEdge(String(requirement), String(topic.id))
             }
         }
 
