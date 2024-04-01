@@ -12,8 +12,8 @@ const fetcher = ([url, uuid]: [string, string]) => {
     }
 }
 
-const updateGraph = () => {
-
+async function updateGraph(url, { arg }: { arg: Topic | Requirement }) {
+    
 }
 
 interface GraphContainerProps {

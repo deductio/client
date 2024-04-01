@@ -18,8 +18,11 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import TopicEditor from "./TopicEditor"
 
+interface EditTopicModalProps extends TopicModalProps {
+    saveTopic: (topic: Topic) => void
+}
 
-const EditTopicModal = (props: TopicModalProps) => {
+const EditTopicModal = (props: EditTopicModalProps) => {
 
         const { content, data } = useMemo(() => matter(props.topic.content), [props.topic.content])
         const resources: Resource[] = data.resources || []
@@ -39,6 +42,8 @@ const EditTopicModal = (props: TopicModalProps) => {
         {resources.map((resource: Resource, i: number) => {
             return <ResourceItem key={i} {...resource}></ResourceItem>
         })}
+
+        <button>Save topic!</button>
     </Modal>)
 }
 

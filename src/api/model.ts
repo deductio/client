@@ -9,7 +9,6 @@ type Topic = {
     knowledge_graph_id: string,
     knowledge_graph_index: number,
     title: string,
-    requirements: number[],
     id: number,
     content: string,
     subject: string

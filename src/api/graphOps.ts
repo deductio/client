@@ -64,14 +64,13 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
                     id: Math.random(),
                     knowledge_graph_id: "",
                     knowledge_graph_index: Math.random(),
-                    title: "Shine On You Crazy Diamond",
+                    title: "<new node>",
                     requirements: [],
                     content: "",
                     subject: ""
                 })
 
         } else if (action.type === "selectNode") {
-            console.log("oh yeah")
 
             if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
                 draft.selectedTopics.push(action.node)
