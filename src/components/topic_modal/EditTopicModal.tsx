@@ -1,50 +1,50 @@
 //import rehypeKatex from "rehype-katex"
 import Modal from "react-modal"
-import matter from "gray-matter"
-import { useMemo } from "react"
+import { useMemo, useState, ChangeEvent } from "react"
 import 'katex/dist/katex.min.css' 
 
-import { Topic, Resource } from "../../api/model"
+import { Topic } from "../../api/model"
 import ResourceItem from "./ResourceItem"
 
 import { TopicModalProps } from "./TopicModal"
 
-import {LexicalComposer} from '@lexical/react/LexicalComposer';
-import {ContentEditable} from '@lexical/react/LexicalContentEditable';
-import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
-import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
+
 import TopicEditor from "./TopicEditor"
+import { FetcherWithComponents, useFetcher } from "react-router-dom"
+import { GraphReduceAction } from "../../api/graphOps"
 
 interface EditTopicModalProps extends TopicModalProps {
-    saveTopic: (topic: Topic) => void
+    fetcher: FetcherWithComponents<any>,
+    dispatch: (event: GraphReduceAction) => void
 }
 
 const EditTopicModal = (props: EditTopicModalProps) => {
 
-        const { content, data } = useMemo(() => matter(props.topic.content), [props.topic.content])
-        const resources: Resource[] = data.resources || []
+    const [title, setTitle] = useState(props.topic.title)
+    const [content, setContent] = useState(props.topic.content)
 
-        /*
-         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {content}
-        </Markdown>
-        */
+    const updateContent = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setContent(e.target.value)
+    }
 
-        return (<Modal isOpen={true} onRequestClose={props.closeModal}>
-        <h1 style={{ textAlign: "center" }}>{props.topic.title}</h1>
+    const updateTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value)
+    }
 
-        <TopicEditor/>
+    console.log(props.topic)
 
-        <h2 style={{ textAlign: "center" }}><ul>Resources</ul></h2>
-        {resources.map((resource: Resource, i: number) => {
-            return <ResourceItem key={i} {...resource}></ResourceItem>
-        })}
+    return <Modal isOpen={true} onRequestClose={props.closeModal}>
+        <props.fetcher.Form method="POST" action={`graph/edit/${props.topic.knowledge_graph_id}/add_topic`}>
+            <input type="hidden" name="knowledge_graph_id" value={props.topic.knowledge_graph_id}></input>
+            <input type="hidden" name="id" value={props.topic.id}></input>
+            <input type="hidden" name="subject" value={props.topic.subject}></input>
+            <h1 style={{ textAlign: "center" }}><input type="text" value={title} onChange={updateTitle} name="title"></input></h1>
+            <textarea name="content" value={content} onChange={updateContent}></textarea>
 
-        <button>Save topic!</button>
-    </Modal>)
+            <button onClick={() => setTimeout(() => props.dispatch({ type: "premodifyTopic" }), 0)}>Save topic!</button>
+        </props.fetcher.Form>
+            
+    </Modal>
 }
 
 Modal.setAppElement("#root")

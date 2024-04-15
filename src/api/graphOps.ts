@@ -1,25 +1,30 @@
 import reverse from 'graphology-operators/reverse';
 
-import { KnowledgeGraph, Topic } from "./model"
+import { KnowledgeGraph, Requirement, Topic } from "./model"
 import { produce } from 'immer';
 
 type GraphReduceAction = {
-    type: "deleteNode",
+    type: "deleteTopic",
     node: number 
 } | {
-    type: "addNode"
+    type: "addTopic"
 } | {
-    type: "addEdge"
+    type: "addRequirement"
 } | {
-    type: "removeEdge",
+    type: "deleteRequirement",
     source: number,
     destination: number
 } | {
-    type: "selectNode",
+    type: "selectTopic",
     node: number
 } | {
-    type: "deselectNode",
+    type: "deselectTopic",
     node: number
+} | {
+    type: "modifyTopic",
+    topic: Topic
+} | {
+    type: "premodifyTopic" // only used to signal modifyTopic
 }
 
 interface GraphReducerState {
@@ -30,61 +35,76 @@ interface GraphReducerState {
 // unfinished!
 const graphReducer = (state: GraphReducerState, action: GraphReduceAction) => 
     produce(state, draft => {
-        if (action.type === "deleteNode") {
-                draft.graph.topics = draft.graph.topics
+        if (action.type === "deleteTopic") {
+            draft.graph.topics = draft.graph.topics
                 .filter(topic => topic.id != action.node)
-                .map(topic => {
-                    topic.requirements = topic.requirements.filter(requirement => requirement !== action.node)
-                    return topic
-                })
+            
+            draft.graph.requirements = draft.graph.requirements
+                .filter(requirement => requirement.source !== action.node && requirement.destination !== action.node)
 
-        } else if (action.type === "removeEdge") {
+            draft.selectedTopics = []
 
-                const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
+        } else if (action.type === "deleteRequirement") {
 
-                draft.graph.topics[index].requirements = draft.graph.topics[index]
-                    .requirements
-                    .filter(requirement => requirement != action.source)
+            const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
 
-        } else if (action.type === "addEdge") {
+            draft.graph.requirements = draft.graph.requirements
+                .filter(requirement => requirement.source !== draft.selectedTopics[0] || requirement.destination !== draft.selectedTopics[1])
+
+        } else if (action.type === "addRequirement") {
             // TODO: cycle detection
 
-                if (draft.selectedTopics.length == 2) {
-                    const index = draft.graph.topics.findIndex(topic => topic.id == draft.selectedTopics[1])
+            if (draft.selectedTopics.length == 2) {
 
-                    draft.graph.topics[index].requirements.push(draft.selectedTopics[0])
-
-                    draft.selectedTopics = []
-                }
-                
-
-        } else if (action.type === "addNode") {
-
-                draft.graph.topics.push({
-                    id: Math.random(),
-                    knowledge_graph_id: "",
-                    knowledge_graph_index: Math.random(),
-                    title: "<new node>",
-                    requirements: [],
-                    content: "",
-                    subject: ""
+                draft.graph.requirements.push({
+                    id: 0,
+                    source: draft.selectedTopics[0],
+                    destination: draft.selectedTopics[1]
                 })
 
-        } else if (action.type === "selectNode") {
+                draft.selectedTopics = []
+            }
+                
+
+        } else if (action.type === "addTopic") {
+
+            draft.graph.topics.push({
+                id: 0,
+                knowledge_graph_id: draft.graph.id,
+                title: "<new node>",
+                content: "",
+                subject: ""
+            })
+
+        } else if (action.type === "selectTopic") {
 
             if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
                 draft.selectedTopics.push(action.node)
             }
 
-        } else if (action.type === "deselectNode") {
+        } else if (action.type === "deselectTopic") {
 
-                draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
+            draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
 
-        } else { // satisfy the typescript compiler
+        } else if (action.type === "modifyTopic"){ // satisfy the typescript compiler
             
+            draft.graph.topics = draft.graph.topics.map(topic => topic.id === action.topic.id ? action.topic : topic)
+
         }
     })
 
+type GraphAPIAction = {
+    type: "addTopic",
+    topic: Topic
+} | {
+    type: "deleteTopic",
+    topicId: number
+} | {
+    type: "addRequirement",
+    requirement: Requirement
+} | {
+    type: "deleteRequirement",
+    requirementId: number
+}
 
-
-export { graphReducer, type GraphReduceAction }
+export { graphReducer, type GraphReduceAction, type GraphAPIAction }

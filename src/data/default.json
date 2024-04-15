@@ -1,6 +1,6 @@
 {
 
-    "title": "Welcome to deduct.io!",
+    "name": "Welcome to deduct.io!",
     "description": "Tutorial on how to use deduct.io",
     "topics": [
         {
@@ -13,7 +13,7 @@
             "requirements": []
         }
     ],
-    "id": "0"
-
-    
+    "requirements": [],
+    "id": "0",
+    "owner": "0"
 }

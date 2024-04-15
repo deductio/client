@@ -29,10 +29,6 @@ const TopicModal = (props: TopicModalProps) => {
         return (<Modal isOpen={true} onRequestClose={props.closeModal}>
         <h1 style={{ textAlign: "center" }}>{props.topic.title}</h1>
 
-        <h2 style={{ textAlign: "center" }}><ul>Resources</ul></h2>
-        {resources.map((resource: Resource, i: number) => {
-            return <ResourceItem key={i} {...resource}></ResourceItem>
-        })}
     </Modal>)
 }
 

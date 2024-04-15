@@ -7,11 +7,11 @@ interface GraphEditorProps {
     dispatch: Dispatch<GraphReduceAction>
 }
 
-
 const GraphEditor = (props: GraphEditorProps) => {
     return (<div>
-        <button onClick={() => props.dispatch({ type: "addNode" })}>add top</button>
-        <button onClick={() => props.dispatch({ type: "addEdge" })}>add edge</button>
+        <button className="bg-indigo-600 rounded text-white p-4" onClick={() => props.dispatch({ type: "addTopic" })}>add topic</button>
+        <button className="bg-indigo-600 rounded text-white p-4" onClick={() => props.dispatch({ type: "addRequirement" })}>add edge</button>
+        <button className="bg-indigo-600 rounded text-white p-4" onClick={() => props.dispatch({ type: "deleteTopic", node: 0 })}>delete topic</button>
     </div>)
 }
 

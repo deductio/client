@@ -1,17 +1,15 @@
-type Resource = {
-    title: string,
-    description: string,
-    link: string | null,
-    img: string | null
-}
-
 type Topic = {
     knowledge_graph_id: string,
-    knowledge_graph_index: number,
     title: string,
     id: number,
     content: string,
     subject: string
+}
+
+type Requirement = {
+    id: number,
+    source: number,
+    destination: number
 }
 
 type KnowledgeGraph = {
@@ -19,7 +17,21 @@ type KnowledgeGraph = {
     name: string,
     description: string,
     owner: string,
-    topics: Topic[]
+    topics: Topic[],
+    requirements: Requirement[]
 }
 
-export type { KnowledgeGraph, Topic, Resource }
+type SearchResultGraph = {
+    id: string,
+    name: string,
+    description: string,
+    owner: string
+}
+
+type User = {
+    username: string,
+    avatar: string,
+    graphs: SearchResultGraph[]
+}
+
+export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User }

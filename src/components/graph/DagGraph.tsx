@@ -33,22 +33,19 @@ const DagGraph = (props: DagGraphProps) => {
                 width: 100,
                 height: 100
             })
-
-            
     
             graph.setNodeAttribute(topic.id, "id", topic.id)
-
-            console.log(graph, props.graph.topics)
     
-            for (const requirement of topic.requirements) {
-                graph.addEdge(requirement, topic.id,  { 
-                    label: "REL_1",
-                    type: "arrow",
-                    size: 3
-                });
+        }
 
-                dag.setEdge(String(requirement), String(topic.id))
-            }
+        for (const requirement of props.graph.requirements) {
+            graph.addEdge(requirement[0], requirement[1],  { 
+                label: "REL_1",
+                type: "arrow",
+                size: 3
+            });
+
+            dag.setEdge(String(requirement[0]), String(requirement[1]))
         }
 
         dagre.layout(dag, { nodesep: 300, edgesep: 400, ranksep: 400 })
