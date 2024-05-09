@@ -26,10 +26,6 @@ const ViewGraph = () => {
     const [queuedUpdate, queueUpdate]: [GraphReduceAction | null, Dispatch<SetStateAction<GraphReduceAction | null>>] = useState<GraphReduceAction | null>(null)
 
     const localProgress = localProgressTemp as number[]
-    /*
-    if (_graph?.progress === null && !Cookies.get("name"))
-        _graph.progress = localProgress 
-    */
 
     const [openedTopic, setOpenTopic]: [Topic | null, any] = useState(null)
 

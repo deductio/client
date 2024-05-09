@@ -108,7 +108,7 @@ const routes = [
                                 "Content-Type": "application/json"
                             },
                             method: "PUT",
-                            body: JSON.stringify(await request.json())
+                            body: JSON.stringify(json)
                         })
                     } else if (request.method === "DELETE") {
                         return fetch(`/api/graph/edit/${params.uuid}/requirement?src=${json.src}&dest=${json.dest}`, {
@@ -137,6 +137,25 @@ const routes = [
             }
         },
         nodeRef: createRef()
+    },
+
+    {
+        path: "graph/update/:uuid",
+        action: async ({ request, params }: { request: Request, params: Params<string> }) => {
+            return fetch(`/api/graph/edit/${params.uuid}`, {
+                method: "PUT",
+                body: await request.formData()
+            })
+        },
+    },
+
+    {
+        path: "graph/delete/:uuid",
+        action: async ({ params }: { params: Params<string> }) => {
+            return fetch(`/api/graph/edit/${params.uuid}`, {
+                method: "DELETE"
+            })
+        },
     },
 
     {

@@ -7,7 +7,7 @@ const EditReducer = (props: { selected: number[] }) => {
         if (props.selected.includes(Number(node))) {
             return {
                 ...data,
-                color: "black"
+                color: "#7c3aed"
             }
         } else if (props.selected.length != 0) {
             return {

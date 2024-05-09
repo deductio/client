@@ -24,6 +24,8 @@ type GraphReduceAction = {
 } | {
     type: "removeProgress",
     node: number
+} | {
+    type: "clearSelected"
 }
 
 interface GraphReducerState {
@@ -47,6 +49,8 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
 
             draft.graph.requirements = draft.graph.requirements
                 .filter(requirement => requirement[0] !== draft.selectedTopics[0] || requirement[1] !== draft.selectedTopics[1])
+
+            draft.selectedTopics = []
 
         } else if (action.type === "addRequirement") {
             // TODO: cycle detection
@@ -76,6 +80,8 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
             if (!(draft.graph.progress?.includes(action.node))) draft.graph.progress?.push(action.node)
         } else if (action.type === "removeProgress") {
             draft.graph.progress = draft.graph.progress?.filter(progress => progress !== action.node)
+        } else if (action.type === "clearSelected") {
+            draft.selectedTopics = []
         }
     })
 

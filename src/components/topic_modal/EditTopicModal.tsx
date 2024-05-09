@@ -3,8 +3,8 @@ import Modal from "react-modal"
 import { useState, ChangeEvent, useRef, MutableRefObject, useEffect } from "react"
 import { LexicalEditor } from "lexical"
 import 'katex/dist/katex.min.css' 
-import { TopicModalProps } from "../topic_modal/TopicModal"
-import TopicViewer from "./LexicalTopic"
+import { TopicModalProps } from "./TopicModal"
+import TopicViewer from "../lexical/LexicalTopic"
 
 const EditTopicModal = (props: TopicModalProps) => {
 

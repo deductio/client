@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect } from "react"
+import { useState, useReducer, useEffect, useRef } from "react"
 import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { KnowledgeGraph, Topic } from "../api/model"
@@ -7,32 +7,42 @@ import GraphEditEvents from "../components/graph/GraphEditEvents";
 import SearchBar from "../components/search/SearchBar";
 import { GraphReduceAction, graphReducer } from "../api/graphOps";
 import { produce } from "immer";
-import EditTopicModal from "../components/lexical/EditTopicModal";
-import { useFetcher, useLoaderData, useLocation } from "react-router-dom";
+import EditTopicModal from "../components/topic_modal/EditTopicModal";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import EditReducer from "../components/graph/EditReducer";
+
+type EditGraphState = { graph: KnowledgeGraph, selectedTopics: number[] }
 
 // The nodes and edges selected within the graph are internal state.
 const EditGraph = () => {
 
     const dataGraph = useLoaderData() as KnowledgeGraph
     const fetcher = useFetcher()
-    const location = useLocation()
-
-    
 
     const curriedGraphReducer = produce(graphReducer)
     const [{ graph, selectedTopics }, dispatch] = useReducer(curriedGraphReducer, { graph: dataGraph, selectedTopics: [] })
 
     const [openedTopic, setOpenTopic]: [Topic | null, any] = useState(null)
 
+    // Stale closure avoidance
+    const graphTopicRef = useRef<EditGraphState>()
+    graphTopicRef.current = { graph, selectedTopics }
+        
+    const openedTopicRef = useRef<Topic | null>()
+    openedTopicRef.current = openedTopic
+
     const openTopic = (id: number) => {
-        const topic = dataGraph.topics.find(topic => topic.id === id)
+        const topic = graphTopicRef.current?.graph.topics.find(topic => topic.id === id)
+
         if (topic) {
             setOpenTopic(topic)
         }
     }
 
     const injectedDispatch = (event: GraphReduceAction) => {
+
+        const graph = graphTopicRef.current?.graph!
+        const selectedTopics = graphTopicRef.current?.selectedTopics!
 
         if (event.type === "deleteTopic") {
             event.node = selectedTopics[0]
@@ -73,16 +83,30 @@ const EditGraph = () => {
     }
 
     useEffect(() => {
-        const topic = graph.topics.find(topic => topic.id === 0)
+        const topic = graphTopicRef.current!.graph.topics.find(topic => topic.id === 0)
         if (topic) {
             setOpenTopic(topic)
         }
     }, [graph.topics])
 
+    useEffect(() => {
+        const keyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                dispatch({ type: "clearSelected" })
+            }
+        }
+
+        document.addEventListener("keydown", keyDown)
+
+        return () => {
+            document.removeEventListener("keydown", keyDown)
+        }
+    }, [])
+
     const closeTopic = () => {
-        if (openedTopic === null) {
+        if (openedTopicRef.current === null) {
             return
-        } else if (openedTopic.id === 0) {
+        } else if (openedTopicRef.current?.id === 0) {
             dispatch({ type: "deleteTopic", node: 0 })
         }
 
@@ -106,7 +130,7 @@ const EditGraph = () => {
                         <button 
                             className={`${selectedTopics.length == 1 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
                             disabled={selectedTopics.length != 1}
-                            onClick={() => injectedDispatch({ type: "addRequirement" })}>Edit Topic</button>
+                            onClick={() => openTopic(graphTopicRef.current!.selectedTopics[0])}>Edit Topic</button>
                         <button 
                             className={`${selectedTopics.length == 1 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
                             disabled={selectedTopics.length != 1}
@@ -124,7 +148,7 @@ const EditGraph = () => {
                     </div>
                 </div>
             </ControlsContainer>
-            <DagGraph graph={dataGraph}/>
+            <DagGraph graph={dataGraph} selected={selectedTopics}/>
             <GraphEditEvents selectTopic={topic => dispatch({
                 type: "toggleSelectTopic",
                 node: topic

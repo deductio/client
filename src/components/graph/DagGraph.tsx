@@ -6,6 +6,7 @@ import { KnowledgeGraph } from "../../api/model";
 
 interface DagGraphProps {
     graph: KnowledgeGraph,
+    selected?: number[]
 }
 
 const DagGraph = (props: DagGraphProps) => {
@@ -52,6 +53,16 @@ const DagGraph = (props: DagGraphProps) => {
             dag.setEdge(String(requirement[0]), String(requirement[1]))
         }
 
+        if (props.selected !== undefined && props.selected.length === 2 
+            && !props.graph.requirements.some(req => req[0] === props.selected![0] && req[1] === props.selected![1])) {
+            graph.addEdge(props.selected[0], props.selected[1],  { 
+                label: "REL_1",
+                type: "arrow",
+                size: 3,
+                color: "#94a3b8"
+            });
+        }
+
         dagre.layout(dag, { nodesep: 300, edgesep: 400, ranksep: 400 })
 
         graph.forEachNode((node, attributes) => {
@@ -62,7 +73,7 @@ const DagGraph = (props: DagGraphProps) => {
 
         loadGraph(graph)
 
-    }, [loadGraph, props.graph])
+    }, [loadGraph, props.graph, props.selected])
 
     return null
 }

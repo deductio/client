@@ -26,12 +26,13 @@ const Toolbar = () => {
             <span className="material-symbols-rounded" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}>
                 format_underlined
             </span>
-            <span className="material-symbols-rounded">
+            <span className="material-symbols-rounded" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")}>
                 format_strikethrough
             </span>
         </div>
 
-        {/* Block insert functionality */}
+
+        {/* Block insert functionality 
         <div className="flex flex-row p-1">
             <span className="material-symbols-rounded">
                 code
@@ -39,9 +40,9 @@ const Toolbar = () => {
             <span className="material-symbols-rounded">
                 function
             </span>
-        </div>
+        </div>*/}
 
-        {/* General text representation formatting */}
+        {/* General text representation formatting 
         <div className="flex flex-row p-1">
             <span className="material-symbols-rounded">
                 format_size
@@ -52,7 +53,7 @@ const Toolbar = () => {
             <span className="material-symbols-rounded">
                 format_clear
             </span>
-        </div>
+        </div>*/}
 
         {/* Structure helpers */}
         <div className="flex flex-row p-1">
@@ -64,12 +65,6 @@ const Toolbar = () => {
             </span>
         </div>
 
-        {/* Structure helpers */}
-        <div className="flex flex-row p-1">
-            <span className="material-symbols-rounded" onClick={() => editor.dispatchCommand(MARKDOWN_EXPORT, undefined)}>
-                format_list_bulleted
-            </span>
-        </div>
 
     </div>
 }
