@@ -1,28 +1,24 @@
-import { useState, useReducer } from "react"
-import { SigmaContainer } from "@react-sigma/core";
+import { useState, useReducer, useEffect } from "react"
+import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { KnowledgeGraph, Topic } from "../api/model"
 import DagGraph from "../components/graph/DagGraph";
 import GraphEditEvents from "../components/graph/GraphEditEvents";
-import GraphEditor from "../components/graph/GraphEditor";
 import SearchBar from "../components/search/SearchBar";
 import { GraphReduceAction, graphReducer } from "../api/graphOps";
 import { produce } from "immer";
-import EditTopicModal from "../components/topic_modal/EditTopicModal";
-import { useFetcher, useLoaderData } from "react-router-dom";
-
-const SUBJECT_COLORS: { [key: string]: string } = {
-    "Calculus": "red",
-    "Set theory and logic": "blue",
-    "Group theory": "green",
-    "Analysis": "yellow"
-}
+import EditTopicModal from "../components/lexical/EditTopicModal";
+import { useFetcher, useLoaderData, useLocation } from "react-router-dom";
+import EditReducer from "../components/graph/EditReducer";
 
 // The nodes and edges selected within the graph are internal state.
 const EditGraph = () => {
 
     const dataGraph = useLoaderData() as KnowledgeGraph
     const fetcher = useFetcher()
+    const location = useLocation()
+
+    
 
     const curriedGraphReducer = produce(graphReducer)
     const [{ graph, selectedTopics }, dispatch] = useReducer(curriedGraphReducer, { graph: dataGraph, selectedTopics: [] })
@@ -40,21 +36,6 @@ const EditGraph = () => {
 
         if (event.type === "deleteTopic") {
             event.node = selectedTopics[0]
-        } else if (event.type === "premodifyTopic") {
-            const formTopic = fetcher.data
-
-            console.log("bruh, come on")
-             
-            if (formTopic) {
-
-                event = {
-                    type: "modifyTopic",
-                    topic: formTopic
-                }
-            }
-
-            console.log(formTopic, fetcher, "?", event)
-
         }
 
         dispatch(event)
@@ -65,53 +46,95 @@ const EditGraph = () => {
                 source: selectedTopics[0],
                 destination: selectedTopics[1]
             }, {
-                method: "POST",
-                action: `graph/edit/${graph.id}/add_requirement`,
+                method: "PUT",
+                action: `/graph/edit/${graph.id}/requirement`,
                 encType: "application/json"
             })
         } else if (event.type === "deleteTopic") {
             fetcher.submit({ id: event.node }, {
-                method: "POST",
-                action: `graph/edit/${graph.id}/delete_topic`,
+                method: "DELETE",
+                action: `/graph/edit/${graph.id}/topic`,
                 encType: "application/json"
             })
         } else if (event.type === "deleteRequirement") {
-            const requirement = graph.requirements.find(req => req.destination === event.destination && req.source === event.source)
+            const requirement = graph.requirements.find(req => req[1] === selectedTopics[1] && req[0] === selectedTopics[0])
             
             if (requirement !== undefined) {
-                fetcher.submit({ id: requirement.id }, {
-                    method: "POST",
-                    action: `graph/edit/${graph.id}/delete_requirement`,
+                fetcher.submit({ src: requirement[0], dest: requirement[1] }, {
+                    method: "DELETE",
+                    action: `/graph/edit/${graph.id}/requirement`,
                     encType: "application/json"
                 })
             }
-        } else if (event.type === "addTopic") {
-            fetcher.submit({
-                knowledge_graph_id: graph.id,
-                title: "<new node>",
-                content: "",
-                subject: ""
-            }, {
-                method: "POST",
-                action: `graph/edit/${graph.id}/add_topic`,
-            })
+        } else if (event.type === "modifyTopic") {
+        
+            fetcher.submit(event.topic, { method: "PUT", action: `/graph/edit/${graph.id}/topic` })
         }
     }
 
-    const closeTopic = () => setOpenTopic(null)
+    useEffect(() => {
+        const topic = graph.topics.find(topic => topic.id === 0)
+        if (topic) {
+            setOpenTopic(topic)
+        }
+    }, [graph.topics])
+
+    const closeTopic = () => {
+        if (openedTopic === null) {
+            return
+        } else if (openedTopic.id === 0) {
+            dispatch({ type: "deleteTopic", node: 0 })
+        }
+
+        setOpenTopic(null)
+    }
+
+    if (dataGraph === undefined) {
+        return <></>
+    }
 
     return <div>
         <SearchBar topics={graph.topics} />
-        <SigmaContainer style={{ height: "50vh", width: "100vw" }}>
+        <SigmaContainer style={{ height: "90vh", width: "100vw" }}>
+            <ControlsContainer>
+                <div className={`flex flex-col ${openedTopic != null ? "hidden" : ""}`}>
+                    <div>
+                        <button 
+                            className={`${selectedTopics.length == 0 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
+                            disabled={selectedTopics.length != 0}
+                            onClick={() => { injectedDispatch({ type: "addTopic" })}}>Add Topic</button>
+                        <button 
+                            className={`${selectedTopics.length == 1 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
+                            disabled={selectedTopics.length != 1}
+                            onClick={() => injectedDispatch({ type: "addRequirement" })}>Edit Topic</button>
+                        <button 
+                            className={`${selectedTopics.length == 1 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
+                            disabled={selectedTopics.length != 1}
+                            onClick={() => injectedDispatch({ type: "deleteTopic", node: 0 })}>Delete Topic</button>
+                    </div>
+                    <div className="flex">
+                        <button 
+                            className={`${selectedTopics.length == 2 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1 w-full`}
+                            disabled={selectedTopics.length != 2}
+                            onClick={() => injectedDispatch({ type: "deleteRequirement" })}>Delete Edge</button>
+                        <button 
+                            className={`${selectedTopics.length == 2 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1 w-full`}
+                            disabled={selectedTopics.length != 2}
+                            onClick={() => injectedDispatch({ type: "addRequirement" })}>Add Edge</button>
+                    </div>
+                </div>
+            </ControlsContainer>
             <DagGraph graph={dataGraph}/>
             <GraphEditEvents selectTopic={topic => dispatch({
-                type: "selectTopic",
+                type: "toggleSelectTopic",
                 node: topic
             })} modifyTopic={openTopic}/>
+            <EditReducer selected={selectedTopics}/>
+\
         </SigmaContainer>
-        <GraphEditor graph={dataGraph} dispatch={injectedDispatch} />
         
-        { openedTopic !== null ? <EditTopicModal topic={openedTopic} closeModal={closeTopic} fetcher={fetcher} dispatch={injectedDispatch}/> : "" }
+        
+        <EditTopicModal topic={openedTopic} closeModal={closeTopic} dispatch={injectedDispatch}/>
     </div>
 }
 

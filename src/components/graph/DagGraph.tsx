@@ -1,17 +1,21 @@
-import { useLoadGraph } from "@react-sigma/core";
+import { useLoadGraph, useSigma } from "@react-sigma/core";
 import dagre from "dagre";
 import { DirectedGraph } from "graphology";
 import { useEffect } from "react";
 import { KnowledgeGraph } from "../../api/model";
 
 interface DagGraphProps {
-    graph: KnowledgeGraph
+    graph: KnowledgeGraph,
 }
 
 const DagGraph = (props: DagGraphProps) => {
+
     //const { positions, assign } = useLayoutNoverlap({ maxIterations: 1000 });
     const loadGraph = useLoadGraph();
+    const sigma = useSigma()
 
+    sigma.setSetting("labelFont", "IBM Plex Sans")
+    
     useEffect(() => {
         const graph: DirectedGraph = new DirectedGraph() // visualization
         const dag = new dagre.graphlib.Graph() // layout control
@@ -24,8 +28,8 @@ const DagGraph = (props: DagGraphProps) => {
                 x: 0, 
                 y: 0,
                 label: topic.title,
-                size: 10,
-                color: "blue",
+                size: 20,
+                color: "#6366f1",
             })
 
             dag.setNode(String(topic.id), {
@@ -54,10 +58,8 @@ const DagGraph = (props: DagGraphProps) => {
             const act_node = dag.node(node)
             graph.setNodeAttribute(node, "x", act_node.x / 1)
             graph.setNodeAttribute(node, "y", act_node.y / 1)
-            console.log(act_node, node, attributes)
         })
 
-        
         loadGraph(graph)
 
     }, [loadGraph, props.graph])

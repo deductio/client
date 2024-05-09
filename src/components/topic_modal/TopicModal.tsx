@@ -1,35 +1,41 @@
-
-//import rehypeKatex from "rehype-katex"
-import remarkMath from "remark-math"
 import Modal from "react-modal"
-import matter, { GrayMatterFile, Input } from "gray-matter"
-import { useMemo } from "react"
 import 'katex/dist/katex.min.css' 
-
-import { Topic, Resource } from "../../api/model"
-import ResourceItem from "./ResourceItem"
+import { Topic } from "../../api/model"
+import LexicalTopic from "../lexical/LexicalTopic"
+import { LexicalEditor } from "lexical"
+import { useRef } from "react"
+import { GraphReduceAction } from "../../api/graphOps"
 
 interface TopicModalProps {
-    topic: Topic,
-    closeModal: () => void
+    topic: Topic | null,
+    dispatch: (event: GraphReduceAction) => void
+    closeModal: () => void,
 }
 
+const TopicModal = (props: TopicModalProps & { completed: boolean | undefined }) => {
 
-const TopicModal = (props: TopicModalProps) => {
+        const editor = useRef<LexicalEditor>(null)
 
-        const { content, data } = useMemo(() => matter(props.topic.content), [props.topic.content])
-        const resources: Resource[] = data.resources || []
-
-        /*
-         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {content}
-        </Markdown>
-        */
-
-        return (<Modal isOpen={true} onRequestClose={props.closeModal}>
-        <h1 style={{ textAlign: "center" }}>{props.topic.title}</h1>
-
-    </Modal>)
+        return <Modal isOpen={props.topic !== null} onRequestClose={props.closeModal}>
+            <div>
+                {(props.topic !== null) ? 
+                    <><div className="text-center p-2"><h1 className="text-2xl">{props.topic.title}</h1></div>
+                <LexicalTopic mode="view" state={props.topic.content === "" ? 
+                        '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}' 
+                        : props.topic.content} editorRef={editor}/>
+        
+                    <div className="flex flex-center justify-center p-4">
+                        <button className="bg-indigo-600 rounded text-white p-4" onClick={_ => {
+                            props.dispatch({ type: props.completed ? "removeProgress" : "addProgress", node: props.topic!.id })
+                            props.closeModal()
+                        }}>{props.completed ? "Wait, undo!" : "I understand!"}</button>
+                    </div>
+                    </>
+                    
+                    : <></>
+                }
+            </div>
+        </Modal>
 }
 
 Modal.setAppElement("#root")

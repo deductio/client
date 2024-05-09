@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,100,0,0");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,4 +8,43 @@ body {
   font-family: "IBM Plex Sans";
   font-weight: 300;
   font-style: normal
+}
+
+.editor-list-ol {
+  @apply list-decimal list-inside
+}
+
+.editor-list-ul {
+  @apply list-disc list-inside
+}
+
+.editor-heading-h1 {
+  @apply text-4xl
+}
+
+.editor-heading-h2 {
+  @apply text-2xl
+}
+
+.sigma-container {
+  background-image: radial-gradient(gray 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.main-app-enter {
+  opacity: 0;
+}
+
+.main-app-enter-active {
+  opacity: 1;
+  transition: 200ms;
+}
+
+.main-app-exit {
+  opacity: 1;
+}
+
+.main-app-exit-active {
+  opacity: 0;
+  transition: 200ms;
 }

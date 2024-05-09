@@ -12,19 +12,18 @@ type GraphReduceAction = {
     type: "addRequirement"
 } | {
     type: "deleteRequirement",
-    source: number,
-    destination: number
 } | {
-    type: "selectTopic",
-    node: number
-} | {
-    type: "deselectTopic",
+    type: "toggleSelectTopic",
     node: number
 } | {
     type: "modifyTopic",
     topic: Topic
 } | {
-    type: "premodifyTopic" // only used to signal modifyTopic
+    type: "addProgress",
+    node: number
+} | {
+    type: "removeProgress",
+    node: number
 }
 
 interface GraphReducerState {
@@ -40,34 +39,24 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
                 .filter(topic => topic.id != action.node)
             
             draft.graph.requirements = draft.graph.requirements
-                .filter(requirement => requirement.source !== action.node && requirement.destination !== action.node)
+                .filter(requirement => requirement[0] !== action.node && requirement[1] !== action.node)
 
             draft.selectedTopics = []
 
         } else if (action.type === "deleteRequirement") {
 
-            const index = draft.graph.topics.findIndex(topic => topic.id == action.destination)
-
             draft.graph.requirements = draft.graph.requirements
-                .filter(requirement => requirement.source !== draft.selectedTopics[0] || requirement.destination !== draft.selectedTopics[1])
+                .filter(requirement => requirement[0] !== draft.selectedTopics[0] || requirement[1] !== draft.selectedTopics[1])
 
         } else if (action.type === "addRequirement") {
             // TODO: cycle detection
-
             if (draft.selectedTopics.length == 2) {
 
-                draft.graph.requirements.push({
-                    id: 0,
-                    source: draft.selectedTopics[0],
-                    destination: draft.selectedTopics[1]
-                })
+                draft.graph.requirements.push([draft.selectedTopics[0], draft.selectedTopics[1]])
 
                 draft.selectedTopics = []
             }
-                
-
         } else if (action.type === "addTopic") {
-
             draft.graph.topics.push({
                 id: 0,
                 knowledge_graph_id: draft.graph.id,
@@ -75,21 +64,18 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
                 content: "",
                 subject: ""
             })
+        } else if (action.type === "toggleSelectTopic") {
+            if (draft.selectedTopics.includes(action.node)) draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
 
-        } else if (action.type === "selectTopic") {
-
-            if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
+            else if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
                 draft.selectedTopics.push(action.node)
             }
-
-        } else if (action.type === "deselectTopic") {
-
-            draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
-
-        } else if (action.type === "modifyTopic"){ // satisfy the typescript compiler
-            
+        } else if (action.type === "modifyTopic"){ 
             draft.graph.topics = draft.graph.topics.map(topic => topic.id === action.topic.id ? action.topic : topic)
-
+        } else if (action.type === "addProgress") {
+            if (!(draft.graph.progress?.includes(action.node))) draft.graph.progress?.push(action.node)
+        } else if (action.type === "removeProgress") {
+            draft.graph.progress = draft.graph.progress?.filter(progress => progress !== action.node)
         }
     })
 

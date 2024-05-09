@@ -6,7 +6,7 @@ import { SearchResultGraph } from "../api/model";
 const SearchGraph = () => {
     const results = useActionData() as (SearchResultGraph[] | undefined)
 
-    return <div className="bg-indigo-100 h-screen flex items-center justify-center">
+    return <div className="bg-indigo-100 h-screen flex flex-col items-center justify-center">
         <SmallForm action="/search">
             <h1 className="font-bold text-4xl">Search for a graph</h1>
 

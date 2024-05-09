@@ -1,3 +1,5 @@
+import { EditorState } from "lexical"
+
 type Topic = {
     knowledge_graph_id: string,
     title: string,
@@ -18,14 +20,15 @@ type KnowledgeGraph = {
     description: string,
     owner: string,
     topics: Topic[],
-    requirements: Requirement[]
+    requirements: [number, number][],
+    progress: number[] | undefined
 }
 
 type SearchResultGraph = {
     id: string,
     name: string,
     description: string,
-    owner: string
+    author: string
 }
 
 type User = {
