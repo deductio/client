@@ -48,3 +48,166 @@ body {
   opacity: 0;
   transition: 200ms;
 }
+
+.editor-code {
+  color: white;
+  display: block;
+  @apply m-4 p-2
+}
+
+code[class*="language-"]::selection,
+pre[class*="language-"]::selection,
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
+	background: #363636;
+}
+
+.editor-code {
+  background: #363636;
+}
+
+.prism_atrule {
+	color: #c792ea;
+}
+
+.prism_attr-name {
+	color: #ffcb6b;
+}
+
+.prism_attr-value {
+	color: #a5e844;
+}
+
+.prism_attribute {
+	color: #a5e844;
+}
+
+.prism_boolean {
+	color: #c792ea;
+}
+
+.prism_builtin {
+	color: #ffcb6b;
+}
+
+.prism_cdata {
+	color: #80cbc4;
+}
+
+.prism_char {
+	color: #80cbc4;
+}
+
+.prism_class {
+	color: #ffcb6b;
+}
+
+.prism_class-name {
+	color: #f2ff00;
+}
+
+.prism_comment {
+	color: #616161;
+}
+
+.prism_constant {
+	color: #c792ea;
+}
+
+.prism_deleted {
+	color: #ff6666;
+}
+
+.prism_doctype {
+	color: #616161;
+}
+
+.prism_entity {
+	color: #ff6666;
+}
+
+.prism_function {
+	color: #c792ea;
+}
+
+.prism_hexcode {
+	color: #f2ff00;
+}
+
+.prism_id {
+	color: #c792ea;
+	font-weight: bold;
+}
+
+.prism_important {
+	color: #c792ea;
+	font-weight: bold;
+}
+
+.prism_inserted {
+	color: #80cbc4;
+}
+
+.prism_keyword {
+	color: #c792ea;
+}
+
+.prism_number {
+	color: #fd9170;
+}
+
+.prism_operator {
+	color: #89ddff;
+}
+
+.prism_prolog {
+	color: #616161;
+}
+
+.prism_property {
+	color: #80cbc4;
+}
+
+.prism_pseudo-class {
+	color: #a5e844;
+}
+
+.prism_pseudo-element {
+	color: #a5e844;
+}
+
+.prism_punctuation {
+	color: #89ddff;
+}
+
+.prism_regex {
+	color: #f2ff00;
+}
+
+.prism_selector {
+	color: #ff6666;
+}
+
+.prism_string {
+	color: #a5e844;
+}
+
+.prism_symbol {
+	color: #c792ea;
+}
+
+.prism_tag {
+	color: #ff6666;
+}
+
+.prism_unit {
+	color: #fd9170;
+}
+
+.prism_url {
+	color: #ff6666;
+}
+
+.prism_variable {
+	color: #ff6666;
+}

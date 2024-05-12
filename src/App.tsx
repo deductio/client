@@ -1,5 +1,5 @@
 import './App.css'
-import { createBrowserRouter, Params, redirect, RouterProvider, useLocation, useMatch, useOutlet } from "react-router-dom";
+import { createBrowserRouter, Params, redirect, RouterProvider, useLocation, useOutlet } from "react-router-dom";
 import { SwitchTransition, CSSTransition } from "react-transition-group"
 import SearchGraph from './pages/SearchGraph';
 import NavBar from './components/NavBar';
@@ -12,15 +12,22 @@ import { createRef, RefObject } from "react"
 const routes = [
     {
         path: "/",
-        element: <p>hello wah</p>
+        loader: async () => {
+            return redirect("/graph/view/00000000-0000-0000-0000-000000000000")
+        }
     },
 
     {
         path: "graph/view/:username/:name",
         element: <ViewGraph/>,
         loader: async ({ params }: { params: Params<string> }) => {
-            return fetch(`/api/graph/view/${params.username}/${params.name}`, { headers: { "Accept": "application/json" } })
-                .then(res => res.json())
+            const ret = await fetch(`/api/graph/view/${params.username}/${params.name}`, { headers: { "Accept": "application/json" } })
+            
+            if (!ret.ok) {
+                throw ret
+            }
+
+            return await ret.json()
         },
         nodeRef: createRef()
     },
@@ -29,8 +36,13 @@ const routes = [
         path: "graph/view/:uuid",
         element: <ViewGraph/>,
         loader: async ({ params }: { params: Params<string> }) => {
-            return fetch(`/api/graph/view/${params.uuid}`, { headers: { "Accept": "application/json" } })
-                .then(res => res.json())
+            const ret = await fetch(`/api/graph/view/${params.uuid}`, { headers: { "Accept": "application/json" } })
+            
+            if (!ret.ok) {
+                throw ret
+            }
+
+            return await ret.json()
         },
         nodeRef: createRef()
     },
@@ -191,7 +203,6 @@ const routes = [
 const AppWrapper = () => {
     const location = useLocation()
     const outlet = useOutlet()
-    const match = useMatch(location.pathname)
 
     const { nodeRef } = routes.find((route) => route.path === location.pathname) ?? {}
 
@@ -199,7 +210,7 @@ const AppWrapper = () => {
         <NavBar/>
         <SwitchTransition>
             <CSSTransition key={location.pathname} mountOnEnter unmountOnExit classNames="main-app" timeout={300} nodeRef={nodeRef as RefObject<HTMLElement | undefined>}>
-                {(state, _,) => {
+                {_ => {
 
                     return <div ref={nodeRef as RefObject<HTMLDivElement>}>
                         {outlet}

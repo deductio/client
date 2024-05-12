@@ -6,7 +6,7 @@ interface SmallFormProps {
 }
 
 const SmallForm = (props: PropsWithChildren<SmallFormProps>) => {
-    return <div className="rounded-lg w-1/3 bg-white shadow-inner shadow-2xl">
+    return <div className="rounded-lg bg-white shadow-inner shadow-2xl">
             <Form method="POST" action={props.action}>
                 <div className="m-8 flex flex-col">
                     {props.children}

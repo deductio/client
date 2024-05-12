@@ -1,5 +1,3 @@
-import { EditorState } from "lexical"
-
 type Topic = {
     knowledge_graph_id: string,
     title: string,
@@ -32,8 +30,10 @@ type SearchResultGraph = {
 }
 
 type User = {
-    username: string,
-    avatar: string,
+    user: {
+        username: string,
+        avatar: string,
+    },
     graphs: SearchResultGraph[]
 }
 

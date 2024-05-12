@@ -65,7 +65,7 @@ const DagGraph = (props: DagGraphProps) => {
 
         dagre.layout(dag, { nodesep: 300, edgesep: 400, ranksep: 400 })
 
-        graph.forEachNode((node, attributes) => {
+        graph.forEachNode((node) => {
             const act_node = dag.node(node)
             graph.setNodeAttribute(node, "x", act_node.x / 1)
             graph.setNodeAttribute(node, "y", act_node.y / 1)

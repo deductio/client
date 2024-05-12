@@ -1,5 +1,3 @@
-import reverse from 'graphology-operators/reverse';
-
 import { KnowledgeGraph, Requirement, Topic } from "./model"
 import { produce } from 'immer';
 

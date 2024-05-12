@@ -16,7 +16,9 @@ import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode"
 import { LexicalEditor } from "lexical"
 import { MutableRefObject } from "react"
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin"
+import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin"
 import THEME from "./theme"
+import { EquationNode } from "./EquationNode"
 
 const LexicalTopic = ({ state, editorRef, mode }: { state: string, editorRef: MutableRefObject<LexicalEditor | null>, mode: "view" | "edit" }) => {
     const initialConfig = {
@@ -30,7 +32,8 @@ const LexicalTopic = ({ state, editorRef, mode }: { state: string, editorRef: Mu
             HorizontalRuleNode,
             HeadingNode,
             QuoteNode,
-            LinkNode
+            LinkNode,
+            EquationNode,
         ],
         editable: mode === "edit",
         editorState: state,
@@ -45,7 +48,8 @@ const LexicalTopic = ({ state, editorRef, mode }: { state: string, editorRef: Mu
                 <Toolbar/>
                 <CommandHandler/>
                 <HistoryPlugin />
-                <MarkdownShortcutPlugin transformers={TRANSFORMERS} /></> : <></>
+                <MarkdownShortcutPlugin transformers={TRANSFORMERS} /></>
+                : <></>
               }
               <ListPlugin/>
               <div className="p-4 outline-none">
@@ -53,7 +57,7 @@ const LexicalTopic = ({ state, editorRef, mode }: { state: string, editorRef: Mu
                   contentEditable={<ContentEditable />}
                   placeholder={<></>}
                   ErrorBoundary={LexicalErrorBoundary}/>
-                </div>
+              </div>
               
           </LexicalComposer>
         </div>

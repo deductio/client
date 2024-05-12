@@ -4,8 +4,10 @@ const ViewReducer = (props: { progress: number[] }) => {
     const sigma = useSigma()
     const graph = sigma.getGraph()
 
+    const progress = props.progress === undefined ? [] : props.progress
+
     sigma.setSetting("nodeReducer", (node, data) => {
-        if (graph.inNeighbors(node).map(Number).some(req => !props.progress.includes(req)) && graph.inDegree(node) !== 0) {
+        if (graph.inNeighbors(node).map(Number).some(req => !progress.includes(req)) && graph.inDegree(node) !== 0) {
             return {
                 ...data,
                 color: "gray"

@@ -1,8 +1,7 @@
-import { $createCodeHighlightNode, $createCodeNode, registerCodeHighlighting } from "@lexical/code"
-import { $getRoot, $createParagraphNode, $getSelection, $isRangeSelection, RangeSelection } from "lexical"
+import { registerCodeHighlighting } from "@lexical/code"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { useEffect } from "react"
-import CommandHandler, { FORMAT_TEXT_COMMAND, MARKDOWN_EXPORT } from "../lexical/CommandHandler"
+import { FORMAT_TEXT_COMMAND, INSERT_MATH_COMMAND, INSERT_CODE_BLOCK_COMMAND } from "../lexical/CommandHandler"
 import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from "@lexical/list"
 
 
@@ -32,15 +31,15 @@ const Toolbar = () => {
         </div>
 
 
-        {/* Block insert functionality 
+        {/* Block insert functionality */}
         <div className="flex flex-row p-1">
-            <span className="material-symbols-rounded">
+            <span className="material-symbols-rounded" onClick={() => editor.dispatchCommand(INSERT_CODE_BLOCK_COMMAND, undefined)}>
                 code
             </span>
-            <span className="material-symbols-rounded">
+            <span className="material-symbols-rounded" onClick={() => editor.dispatchCommand(INSERT_MATH_COMMAND, undefined)}>
                 function
             </span>
-        </div>*/}
+        </div>
 
         {/* General text representation formatting 
         <div className="flex flex-row p-1">

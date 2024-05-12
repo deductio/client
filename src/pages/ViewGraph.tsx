@@ -21,20 +21,26 @@ const ViewGraph = () => {
     const _graph = useLoaderData() as KnowledgeGraph
     const [localProgressTemp, setLocalProgress] = useLocalStorageState(`progress-${_graph?.id}`)
     const fetcher = useFetcher()
+
+    useEffect(() => {
+        if (localProgressTemp === undefined) {
+            setLocalProgress([])
+        }
+    }, [])
     
     // We need to keep track of what we most recently did in order to properly synchronize the state. 
     const [queuedUpdate, queueUpdate]: [GraphReduceAction | null, Dispatch<SetStateAction<GraphReduceAction | null>>] = useState<GraphReduceAction | null>(null)
 
     const localProgress = localProgressTemp as number[]
 
-    const [openedTopic, setOpenTopic]: [Topic | null, any] = useState(null)
+    const [openedTopic, setOpenTopic] = useState<Topic | null>(null)
 
     const curriedGraphReducer = produce(graphReducer)
     const [{ graph }, dispatch] = useReducer(curriedGraphReducer, { graph: _graph, selectedTopics: [] })
 
     // We need to have the graph progress kept in a ref in order to access the latest version at any given time
     const progress = useRef<number[]>([])
-    progress.current = graph.progress || (!Cookies.get("name") ? localProgress : [])
+    progress.current = graph?.progress || localProgress
 
     useEffect(() => {
         if (queuedUpdate !== null) {
@@ -70,7 +76,7 @@ const ViewGraph = () => {
         }
     }, [graph.progress])
 
-    if (graph === null) {
+    if (graph === null || graph === undefined) {
         return <></>
     }
 
@@ -84,7 +90,7 @@ const ViewGraph = () => {
             <ViewReducer progress={graph.progress || (!Cookies.get("name") ? localProgress : [])}/>
         </SigmaContainer>
         
-        <TopicModal topic={openedTopic} closeModal={closeTopic} dispatch={queueUpdate} completed={progress.current.includes(openedTopic?.id)}/>
+        <TopicModal topic={openedTopic} closeModal={closeTopic} dispatch={queueUpdate} completed={progress.current?.includes(openedTopic?.id || -1)}/>
     </>
 }
 

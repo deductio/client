@@ -1,5 +1,5 @@
 import { Link, Form } from "react-router-dom";
-import { KnowledgeGraph, SearchResultGraph } from "../../api/model";
+import { SearchResultGraph } from "../../api/model";
 import { useState } from "react";
 import ReactModal from "react-modal";
 import CreateOrRenameGraph from "../graph/CreateOrRenameGraph";

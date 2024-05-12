@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const NavBar = () => {
@@ -10,10 +9,10 @@ const NavBar = () => {
         <div className="p-2">
             <NavLink to="/" className="p-2">Home</NavLink>
             <NavLink to="/search" className="p-2">Search</NavLink>
-            <NavLink to="/graph/create" className="p-2">Create</NavLink>
+            { username ? <NavLink to="/graph/create" className="p-2">Create</NavLink> : <></> }
         </div>
 
-        <div className="p-2 scale-75">
+        <div className="p-2 scale-50 md:scale-75">
             <p className="font-plex sans-thin-italic italic">graph.deeve.dev</p>
         </div>
 

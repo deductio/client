@@ -8,7 +8,7 @@ const SearchGraph = () => {
 
     return <div className="bg-indigo-100 h-screen flex flex-col items-center justify-center">
         <SmallForm action="/search">
-            <h1 className="font-bold text-4xl">Search for a graph</h1>
+            <h1 className="font-bold text-xl md:text-4xl">Search for a graph</h1>
 
             <input type="text" placeholder="Graph name" name="search" className="border rounded-lg m-2 self-center w-80"></input>
 
