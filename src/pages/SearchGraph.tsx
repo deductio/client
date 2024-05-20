@@ -21,7 +21,7 @@ const SearchGraph = () => {
             <input type="hidden" value="BestMatch" name="order"></input>
         </SmallForm>
 
-        {results ? <SearchResults results={results} mode="view"/> : <></>}
+        {results ? <SearchResults results={results || []}/> : <></>}
     </div>
 }
 

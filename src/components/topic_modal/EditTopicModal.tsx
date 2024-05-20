@@ -30,6 +30,7 @@ const EditTopicModal = (props: TopicModalProps) => {
         <div>
             {(props.topic !== null) ? 
                 <>
+                <span className="material-symbols-rounded float-right" onClick={props.closeModal}>close</span>
                 <div className="text-center p-2"><input className="text-2xl text-center" type="text" value={title} onChange={updateTitle} name="title"></input></div>
                 <TopicViewer mode="edit" state={props.topic.content === "" ? 
                     '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}' 

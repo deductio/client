@@ -8,6 +8,12 @@ import UserProfile from './pages/UserProfile';
 import EditGraph from './pages/EditGraph';
 import ViewGraph from './pages/ViewGraph';    
 import { createRef, RefObject } from "react"
+import TrendingGraph from './pages/TrendingGraphs';
+
+type FullRequest = {
+    params: Params<string>,
+    request: Request
+}
 
 const routes = [
     {
@@ -49,7 +55,7 @@ const routes = [
 
     {
         path: "graph/progress/:uuid",
-        action: async ({ request, params } : { request: Request, params: Params<string> }) => {
+        action: async ({ request, params }: FullRequest) => {
             const { topic } = await request.json()
 
             return fetch(`/api/graph/progress/${params.uuid}?topic=${topic}`, {
@@ -68,7 +74,7 @@ const routes = [
         children: [
             {
                 path: "topic",
-                action: async ({ request, params } : { request: Request, params: Params<string> }) => {
+                action: async ({ request, params }: FullRequest) => {
                     if (request.method === "PUT") {
                         let form_data = Object.fromEntries(await request.formData())
                     
@@ -110,7 +116,7 @@ const routes = [
 
             {
                 path: "requirement",
-                action: async ({ request, params }: { request: Request, params: Params<string> }) => {
+                action: async ({ request, params }: FullRequest) => {
                     const json = await request.json()
 
                     if (request.method === "PUT") {
@@ -153,7 +159,7 @@ const routes = [
 
     {
         path: "graph/update/:uuid",
-        action: async ({ request, params }: { request: Request, params: Params<string> }) => {
+        action: async ({ request, params }: FullRequest) => {
             return fetch(`/api/graph/edit/${params.uuid}`, {
                 method: "PUT",
                 body: await request.formData()
@@ -168,6 +174,19 @@ const routes = [
                 method: "DELETE"
             })
         },
+    },
+
+    {
+        path: "like/:uuid",
+        action: async ({ params, request }: FullRequest) => {
+            const data = await request.formData()
+
+            const method = data.get("liked") === "yes" ? "DELETE" : "PUT"
+
+            return fetch(`/api/graph/like/${params.uuid}`, {
+                method: method
+            })
+        }
     },
 
     {
@@ -194,6 +213,18 @@ const routes = [
         element: <UserProfile/>,
         loader: async ({ params }: { params: Params<string> }) => {
             return fetch(`/api/users/${params.user}`, { headers: { "Accept": "application/json" } })
+                .then(res => res.json())
+        },
+        nodeRef: createRef()
+    },
+
+    {
+        path: "trending/:timerange?",
+        element: <TrendingGraph/>,
+        loader: async ({ params }: { params: Params<string> }) => {
+            const timerange = params.timerange || "all_time"
+
+            return fetch(`/api/trending?timerange=${timerange}`)
                 .then(res => res.json())
         },
         nodeRef: createRef()

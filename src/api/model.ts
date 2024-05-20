@@ -22,19 +22,23 @@ type KnowledgeGraph = {
     progress: number[] | undefined
 }
 
+type FrontendUser = {
+    username: string,
+    avatar: string
+}
+
 type SearchResultGraph = {
     id: string,
     name: string,
     description: string,
-    author: string
+    user: FrontendUser,
+    like_count: number,
+    liked: boolean
 }
 
 type User = {
-    user: {
-        username: string,
-        avatar: string,
-    },
+    user: FrontendUser
     graphs: SearchResultGraph[]
 }
 
-export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User }
+export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser }

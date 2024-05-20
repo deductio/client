@@ -9,6 +9,7 @@ const NavBar = () => {
         <div className="p-2">
             <NavLink to="/" className="p-2">Home</NavLink>
             <NavLink to="/search" className="p-2">Search</NavLink>
+            <NavLink to="/trending" className="p-2">Trending</NavLink>
             { username ? <NavLink to="/graph/create" className="p-2">Create</NavLink> : <></> }
         </div>
 

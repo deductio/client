@@ -18,6 +18,7 @@ const TopicModal = (props: TopicModalProps & { completed: boolean | undefined })
 
         return <Modal isOpen={props.topic !== null} onRequestClose={props.closeModal}>
             <div>
+                <span className="material-symbols-rounded float-right" onClick={props.closeModal}>close</span>
                 {(props.topic !== null) ? 
                     <><div className="text-center p-2"><h1 className="text-2xl">{props.topic.title}</h1></div>
                 <LexicalTopic mode="view" state={props.topic.content === "" ? 
