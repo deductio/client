@@ -36,9 +36,15 @@ type SearchResultGraph = {
     liked: boolean
 }
 
+type PreviewGraph = {
+    id: string,
+    name: string,
+    description: string
+}
+
 type User = {
     user: FrontendUser
     graphs: SearchResultGraph[]
 }
 
-export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser }
+export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser, PreviewGraph }

@@ -83,7 +83,7 @@ const ViewGraph = () => {
     const closeTopic = () => setOpenTopic(null)
 
     return <>
-        <SearchBar topics={graph.topics} />
+        {/*<SearchBar topics={graph.topics} />*/}
         <SigmaContainer style={{ height: "90vh", width: "100vw" }}>
             <DagGraph graph={graph}/>
             <GraphViewEvents clickTopic={openTopic}/>

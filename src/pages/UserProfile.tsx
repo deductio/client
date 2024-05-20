@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router-dom"
 import { User } from "../api/model"
-import SearchResults from "../components/search/SearchResults"
 import Cookies from "js-cookie"
+import UserProfileGraphs from "../components/user/UserProfileGraphs"
 
 const UserProfile = () => {
     const user = useLoaderData() as (User | undefined)
@@ -11,7 +11,7 @@ const UserProfile = () => {
         return <div>
             <h1 className="text-bold text-2xl">{user.user.username}</h1>
 
-            <SearchResults results={user.graphs} mode={user.user.username === currentUser ? "edit" : "view"}/>
+            <UserProfileGraphs graphs={user.graphs} self={user.user.username === currentUser}/>
         </div>
     }
 }

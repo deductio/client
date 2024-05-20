@@ -9,6 +9,7 @@ import EditGraph from './pages/EditGraph';
 import ViewGraph from './pages/ViewGraph';    
 import { createRef, RefObject } from "react"
 import TrendingGraph from './pages/TrendingGraphs';
+import EditGraphData from './pages/EditGraphData';
 
 type FullRequest = {
     params: Params<string>,
@@ -139,7 +140,7 @@ const routes = [
     },
 
     {
-        path: "graph/create",
+        path: "create",
         element: <CreateGraph/>,
         action: async ({ request }: { request: Request }) => {
             let res = await fetch("/api/graph/create", {
@@ -155,6 +156,35 @@ const routes = [
             }
         },
         nodeRef: createRef()
+    },
+
+    {
+        path: "graph/configure/:uuid",
+        element: <EditGraphData/>,
+        nodeRef: createRef(),
+        loader: async ({ params }: { params: Params<string> }) => {
+            return fetch(`/api/graph/preview/${params.uuid}`).then(res => res.json())
+        },
+        action: async ({ params, request }: FullRequest) => {
+            const data = await request.formData()
+
+            const action = data.get("method")
+
+            if (action === "delete") {
+                await fetch(`/api/graph/edit/${params.uuid}`, {
+                    method: "DELETE"
+                })
+                return redirect("/")
+            } else if (action === "modify") {
+                return redirect(`/graph/edit/${params.uuid}`)
+            } else if (action === "save") {
+                await fetch(`/api/graph/edit/${params.uuid}`, {
+                    method: "PUT",
+                    body: data
+                })
+                return ""
+            }
+        }
     },
 
     {
