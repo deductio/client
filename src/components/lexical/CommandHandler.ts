@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { 
     createCommand, LexicalCommand, TextFormatType, COMMAND_PRIORITY_EDITOR, COMMAND_PRIORITY_HIGH, 
-    $getSelection, $isRangeSelection, RangeSelection, $getRoot, $insertNodes, CLICK_COMMAND
+    $getSelection, $isRangeSelection, RangeSelection, $insertNodes
 } from "lexical"
 import { TRANSFORMERS, $convertToMarkdownString } from "@lexical/markdown"
 import { mergeRegister } from "@lexical/utils"

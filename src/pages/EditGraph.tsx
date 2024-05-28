@@ -4,7 +4,6 @@ import "@react-sigma/core/lib/react-sigma.min.css";
 import { KnowledgeGraph, Topic } from "../api/model"
 import DagGraph from "../components/graph/DagGraph";
 import GraphEditEvents from "../components/graph/GraphEditEvents";
-import SearchBar from "../components/search/SearchBar";
 import { GraphReduceAction, graphReducer } from "../api/graphOps";
 import { produce } from "immer";
 import EditTopicModal from "../components/topic_modal/EditTopicModal";
@@ -118,7 +117,6 @@ const EditGraph = () => {
     }
 
     return <div>
-        <SearchBar topics={graph.topics} />
         <SigmaContainer style={{ height: "90vh", width: "100vw" }}>
             <ControlsContainer>
                 <div className={`flex flex-col ${openedTopic != null ? "hidden" : ""}`}>

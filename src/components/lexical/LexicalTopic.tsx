@@ -16,7 +16,6 @@ import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode"
 import { LexicalEditor } from "lexical"
 import { MutableRefObject } from "react"
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin"
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin"
 import THEME from "./theme"
 import { EquationNode } from "./EquationNode"
 

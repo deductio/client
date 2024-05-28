@@ -5,7 +5,6 @@ import { KnowledgeGraph, Topic } from "../api/model"
 import DagGraph from "../components/graph/DagGraph";
 import TopicModal from "../components/topic_modal/TopicModal";
 import GraphViewEvents from "../components/graph/GraphViewEvents";
-import SearchBar from "../components/search/SearchBar";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import ViewReducer from "../components/graph/ViewReducer";
 import useLocalStorageState from "use-local-storage-state";
