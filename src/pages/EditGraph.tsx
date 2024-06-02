@@ -1,10 +1,10 @@
-import { useState, useReducer, useEffect, useRef } from "react"
+import { useState, useReducer, useEffect, useRef, Dispatch, SetStateAction } from "react"
 import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { KnowledgeGraph, Topic } from "../api/model"
 import DagGraph from "../components/graph/DagGraph";
 import GraphEditEvents from "../components/graph/GraphEditEvents";
-import { GraphReduceAction, graphReducer } from "../api/graphOps";
+import { GraphReduceAction, editGraphReducer } from "../api/graphOps";
 import { produce } from "immer";
 import EditTopicModal from "../components/topic_modal/EditTopicModal";
 import { useFetcher, useLoaderData } from "react-router-dom";
@@ -18,10 +18,10 @@ const EditGraph = () => {
     const dataGraph = useLoaderData() as KnowledgeGraph
     const fetcher = useFetcher()
 
-    const curriedGraphReducer = produce(graphReducer)
+    const curriedGraphReducer = produce(editGraphReducer)
     const [{ graph, selectedTopics }, dispatch] = useReducer(curriedGraphReducer, { graph: dataGraph, selectedTopics: [] })
 
-    const [openedTopic, setOpenTopic]: [Topic | null, any] = useState(null)
+    const [openedTopic, setOpenTopic]: [Topic | null, Dispatch<SetStateAction<Topic | null>>] = useState(null as (Topic | null))
 
     // Stale closure avoidance
     const graphTopicRef = useRef<EditGraphState>()
@@ -155,8 +155,11 @@ const EditGraph = () => {
 \
         </SigmaContainer>
         
-        
-        <EditTopicModal topic={openedTopic} closeModal={closeTopic} dispatch={injectedDispatch}/>
+        <EditTopicModal 
+            objectives={graph.objectives.filter(prereq => prereq.topic === openedTopic?.id)} 
+            topic={openedTopic} 
+            closeModal={closeTopic} 
+            dispatch={injectedDispatch}/>
     </div>
 }
 

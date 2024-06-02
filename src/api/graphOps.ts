@@ -1,4 +1,4 @@
-import { KnowledgeGraph, Requirement, Topic } from "./model"
+import { GraphMap, KnowledgeGraph, Requirement, Topic } from "./model"
 import { produce } from 'immer';
 
 type GraphReduceAction = {
@@ -17,23 +17,15 @@ type GraphReduceAction = {
     type: "modifyTopic",
     topic: Topic
 } | {
-    type: "addProgress",
-    node: number
-} | {
-    type: "removeProgress",
-    node: number
-} | {
     type: "clearSelected"
 }
 
-interface GraphReducerState {
+interface EditGraphReducerState {
     graph: KnowledgeGraph,
     selectedTopics: number[]
 }
 
-// unfinished!
-const graphReducer = (state: GraphReducerState, action: GraphReduceAction) => 
-    produce(state, draft => {
+const editGraphReducer = (state: EditGraphReducerState, action: GraphReduceAction) => produce(state, draft => {
         if (action.type === "deleteTopic") {
             draft.graph.topics = draft.graph.topics
                 .filter(topic => topic.id != action.node)
@@ -61,7 +53,7 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
         } else if (action.type === "addTopic") {
             draft.graph.topics.push({
                 id: 0,
-                knowledge_graph_id: draft.graph.id,
+                knowledge_graph_id: draft.graph.id!,
                 title: "<new node>",
                 content: "",
                 subject: ""
@@ -74,14 +66,27 @@ const graphReducer = (state: GraphReducerState, action: GraphReduceAction) =>
             }
         } else if (action.type === "modifyTopic"){ 
             draft.graph.topics = draft.graph.topics.map(topic => topic.id === action.topic.id ? action.topic : topic)
-        } else if (action.type === "addProgress") {
-            if (!(draft.graph.progress?.includes(action.node))) draft.graph.progress?.push(action.node)
-        } else if (action.type === "removeProgress") {
-            draft.graph.progress = draft.graph.progress?.filter(progress => progress !== action.node)
         } else if (action.type === "clearSelected") {
             draft.selectedTopics = []
         }
-    })
+    }
+)
+
+type ViewGraphReduceAction = {
+    type: "addProgress",
+    node: Topic
+} | {
+    type: "removeProgress",
+    node: Topic
+}
+
+const viewGraphReducer = (state: GraphMap, action: ViewGraphReduceAction) => produce(state, draft => {
+    if (action.type === "addProgress") {
+        if (!(draft.progress?.includes(action.node.id))) draft.progress?.push(action.node.id)
+    } else if (action.type === "removeProgress") {
+        draft.progress = draft.progress?.filter(progress => progress !== action.node.id)
+    }
+})
 
 type GraphAPIAction = {
     type: "addTopic",
@@ -97,4 +102,4 @@ type GraphAPIAction = {
     requirementId: number
 }
 
-export { graphReducer, type GraphReduceAction, type GraphAPIAction }
+export { editGraphReducer, viewGraphReducer, type ViewGraphReduceAction, type GraphReduceAction, type GraphAPIAction }

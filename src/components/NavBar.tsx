@@ -10,7 +10,11 @@ const NavBar = () => {
             <NavLink to="/" className="p-2">Home</NavLink>
             <NavLink to="/search" className="p-2">Search</NavLink>
             <NavLink to="/trending" className="p-2">Trending</NavLink>
-            { username ? <NavLink to="/create" className="p-2">Create</NavLink> : <></> }
+            
+            { username ? <>
+                <NavLink to="/create" className="p-2">Create</NavLink>
+                <NavLink to="/maps" className="p-2">Maps</NavLink>
+            </> : <></> }
         </div>
 
         <div className="p-2 scale-50 md:scale-75">

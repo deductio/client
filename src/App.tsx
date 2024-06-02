@@ -10,6 +10,7 @@ import ViewGraph from './pages/ViewGraph';
 import { createRef, RefObject } from "react"
 import TrendingGraph from './pages/TrendingGraphs';
 import EditGraphData from './pages/EditGraphData';
+import UserMaps from './pages/UserMaps';
 
 type FullRequest = {
     params: Params<string>,
@@ -55,21 +56,39 @@ const routes = [
     },
 
     {
-        path: "graph/progress/:uuid",
-        action: async ({ request, params }: FullRequest) => {
+        path: "graph/progress",
+        action: async ({ request }: FullRequest) => {
             const { topic } = await request.json()
 
-            return fetch(`/api/graph/progress/${params.uuid}?topic=${topic}`, {
+            return fetch(`/api/graph/progress/${topic.knowledge_graph_id}?topic=${topic.id}`, {
                 method: request.method
             })
         },
     },
 
     {
+        path: "maps",
+        loader: async () => {
+            return fetch("/api/maps").then(res => res.json())
+        },
+        element: <UserMaps/>,
+        nodeRef: createRef(),
+    },
+
+    {
+        path: "map/:id",
+        loader: async ({ params }: { params: Params<string> }) => {
+            return fetch(`/api/maps/${params.id}`).then(res => res.json())
+        },
+        element: <ViewGraph />,
+        nodeRef: createRef()
+    },
+
+    {
         path: "graph/edit/:uuid",
         element: <EditGraph/>,
         loader: async ({ params }: { params: Params<string> }) => {
-            return fetch(`/api/graph/view/${params.uuid}`, { headers: { "Accept": "application/json" } })
+            return fetch(`/api/graph/edit/${params.uuid}`, { headers: { "Accept": "application/json" } })
                 .then(res => res.json())
         },
         children: [

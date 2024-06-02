@@ -1,12 +1,20 @@
-//import rehypeKatex from "rehype-katex"
 import Modal from "react-modal"
 import { useState, ChangeEvent, useRef, MutableRefObject, useEffect } from "react"
 import { LexicalEditor } from "lexical"
 import 'katex/dist/katex.min.css' 
-import { TopicModalProps } from "./TopicModal"
 import TopicViewer from "../lexical/LexicalTopic"
+import ObjectiveList from "./ObjectiveList"
+import { GraphReduceAction } from "../../api/graphOps"
+import { ObjectivePrerequisite, Topic } from "../../api/model"
 
-const EditTopicModal = (props: TopicModalProps) => {
+interface EditTopicModalProps {
+    topic: Topic | null,
+    objectives: ObjectivePrerequisite[],
+    dispatch: (event: GraphReduceAction) => void
+    closeModal: () => void,
+}
+
+const EditTopicModal = (props: EditTopicModalProps) => {
 
     const [title, setTitle] = useState(props.topic?.title || "")
 
@@ -35,6 +43,8 @@ const EditTopicModal = (props: TopicModalProps) => {
                 <TopicViewer mode="edit" state={props.topic.content === "" ? 
                     '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}' 
                     : props.topic.content} editorRef={editor}/>
+
+                <ObjectiveList objectives={props.objectives}/>
     
                 <div className="flex flex-center justify-center p-4">
                     <button className="bg-indigo-600 rounded text-white p-4" onClick={_ => {

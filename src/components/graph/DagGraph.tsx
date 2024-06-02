@@ -2,10 +2,10 @@ import { useLoadGraph, useSigma } from "@react-sigma/core";
 import dagre from "dagre";
 import { DirectedGraph } from "graphology";
 import { useEffect } from "react";
-import { KnowledgeGraph } from "../../api/model";
+import { GraphMap } from "../../api/model";
 
 interface DagGraphProps {
-    graph: KnowledgeGraph,
+    graph: GraphMap,
     selected?: number[]
 }
 

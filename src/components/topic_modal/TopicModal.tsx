@@ -4,11 +4,11 @@ import { Topic } from "../../api/model"
 import LexicalTopic from "../lexical/LexicalTopic"
 import { LexicalEditor } from "lexical"
 import { useRef } from "react"
-import { GraphReduceAction } from "../../api/graphOps"
+import { ViewGraphReduceAction } from "../../api/graphOps"
 
 interface TopicModalProps {
     topic: Topic | null,
-    dispatch: (event: GraphReduceAction) => void
+    dispatch: (event: ViewGraphReduceAction) => void
     closeModal: () => void,
 }
 
@@ -27,7 +27,7 @@ const TopicModal = (props: TopicModalProps & { completed: boolean | undefined })
         
                     <div className="flex flex-center justify-center p-4">
                         <button className="bg-indigo-600 rounded text-white p-4" onClick={_ => {
-                            props.dispatch({ type: props.completed ? "removeProgress" : "addProgress", node: props.topic!.id })
+                            props.dispatch({ type: props.completed ? "removeProgress" : "addProgress", node: props.topic! })
                             props.closeModal()
                         }}>{props.completed ? "Wait, undo!" : "I understand!"}</button>
                     </div>

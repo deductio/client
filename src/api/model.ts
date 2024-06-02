@@ -12,11 +12,33 @@ type Requirement = {
     destination: number
 }
 
+type Objective = {
+    id: number,
+    title: string,
+    description: string
+}
+
 type KnowledgeGraph = {
     id: string,
     name: string,
     description: string,
     owner: string,
+    topics: Topic[],
+    requirements: [number, number][],
+    progress: number[] | undefined,
+    objectives: ObjectivePrerequisite[]
+}
+
+type ObjectivePrerequisite = {
+    knowledge_graph_id: string,
+    topic: number,
+    objective: Objective,
+    suggested_graph: PreviewGraph,
+    suggested_topic: number
+}
+
+type GraphMap = {
+    id?: string,
     topics: Topic[],
     requirements: [number, number][],
     progress: number[] | undefined
@@ -47,4 +69,4 @@ type User = {
     graphs: SearchResultGraph[]
 }
 
-export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser, PreviewGraph }
+export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser, PreviewGraph, GraphMap, ObjectivePrerequisite, Objective }
