@@ -11,17 +11,20 @@ import { createRef, RefObject } from "react"
 import TrendingGraph from './pages/TrendingGraphs';
 import EditGraphData from './pages/EditGraphData';
 import UserMaps from './pages/UserMaps';
+import { ObjectiveSatisfier, PGTopicPair } from './api/model';
 
 type FullRequest = {
     params: Params<string>,
     request: Request
 }
 
+const MAIN_GRAPH = "00000000-0000-0000-0000-000000000000"
+
 const routes = [
     {
         path: "/",
         loader: async () => {
-            return redirect("/graph/view/00000000-0000-0000-0000-000000000000")
+            return await fetch("/graph/view/" + MAIN_GRAPH).then(res => res.json())
         }
     },
 
@@ -154,6 +157,48 @@ const routes = [
                         })
                     }
                 }
+            },
+
+            {
+                path: "satis",
+                action: async ({ request, params }: FullRequest) => {
+                    const method = request.method 
+                    const req = await request.json()
+
+                    if (method === "DELETE") {
+                        return fetch(`/api/graph/edit/${params.uuid}/satis?topic=${req.node}`, { method: "DELETE" })
+                    } else {
+                        const obj_satis_req = req as ObjectiveSatisfier
+
+                        const body = {
+                            knowledge_graph_id: obj_satis_req.topic.knowledge_graph_id,
+                            topic: obj_satis_req.topic.id,
+                            objective: obj_satis_req.objective.id
+                        }
+
+                        return fetch(`/api/graph/edit/${params.uuid}/satis`, {
+                            method: "PUT",
+                            body: JSON.stringify(body)
+                        })
+                    }
+                }
+            },
+
+            {
+                path: "prereq",
+                action: async ({ request, params }: FullRequest) => {
+                    const method = request.method 
+                    const req = await request.json()
+
+                    if (method === "DELETE") {
+                        return fetch(`/api/graph/edit/${params.uuid}/prereq?topic=${req.node}&obj=${req.objective}`, { method: "DELETE" })
+                    } else {
+                        return fetch(`/api/graph/edit/${params.uuid}/prereq`, {
+                            method: "PUT",
+                            body: JSON.stringify({ ...req, suggested_graph: req.suggested_graph.id, objective: Number(req.objective.id) })
+                        })
+                    }
+                }
             }
         ]
     },
@@ -255,6 +300,44 @@ const routes = [
             }
         },
         nodeRef: createRef()
+    },
+
+    {
+        path: "objectives",
+        action: async ({ request }: { request: Request }) => {
+            return await fetch ("/api/objectives", {
+                method: "POST",
+                body: await request.formData()
+            })
+        }
+    },
+
+    {
+        path: "satisfiers",
+        action: async ({ request }: { request: Request }) => {
+            const req = await request.formData()
+            const res = await fetch(`/api/objectives/search?id=${req.get("id")}`).then(res => res.json()) as PGTopicPair[]
+            const curr_graph = req.get("knowledge_graph_id")
+
+            return {
+                results: res.filter(result => result.graph.id !== curr_graph),
+                objective: {
+                    id: req.get("id"),
+                    title: req.get("title"),
+                    description: req.get("description")
+                }
+            }
+        }
+    },
+
+    {
+        path: "create_objective",
+        action: async({ request }: { request: Request }) => {
+            return await fetch("/api/objectives/", {
+                method: "PUT",
+                body: await request.formData()
+            })
+        }
     },
 
     {

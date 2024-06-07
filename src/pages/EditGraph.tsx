@@ -4,7 +4,7 @@ import "@react-sigma/core/lib/react-sigma.min.css";
 import { KnowledgeGraph, Topic } from "../api/model"
 import DagGraph from "../components/graph/DagGraph";
 import GraphEditEvents from "../components/graph/GraphEditEvents";
-import { GraphReduceAction, editGraphReducer } from "../api/graphOps";
+import { EditContext, GraphReduceAction, editGraphReducer } from "../api/graphOps";
 import { produce } from "immer";
 import EditTopicModal from "../components/topic_modal/EditTopicModal";
 import { useFetcher, useLoaderData } from "react-router-dom";
@@ -49,35 +49,57 @@ const EditGraph = () => {
 
         dispatch(event)
 
-        if (event.type === "addRequirement") {
-            fetcher.submit({
-                knowledge_graph_id: graph.id,
-                source: selectedTopics[0],
-                destination: selectedTopics[1]
-            }, {
-                method: "PUT",
-                action: `/graph/edit/${graph.id}/requirement`,
-                encType: "application/json"
-            })
-        } else if (event.type === "deleteTopic") {
-            fetcher.submit({ id: event.node }, {
-                method: "DELETE",
-                action: `/graph/edit/${graph.id}/topic`,
-                encType: "application/json"
-            })
-        } else if (event.type === "deleteRequirement") {
-            const requirement = graph.requirements.find(req => req[1] === selectedTopics[1] && req[0] === selectedTopics[0])
-            
-            if (requirement !== undefined) {
-                fetcher.submit({ src: requirement[0], dest: requirement[1] }, {
+        switch (event.type) {
+            case "deleteTopic":
+                fetcher.submit({ id: event.node }, {
                     method: "DELETE",
+                    action: `/graph/edit/${graph.id}/topic`,
+                    encType: "application/json"
+                })
+                break;
+            
+            case "deleteRequirement":
+                const requirement = graph.requirements.find(req => req[1] === selectedTopics[1] && req[0] === selectedTopics[0])
+            
+                if (requirement !== undefined) {
+                    fetcher.submit({ src: requirement[0], dest: requirement[1] }, {
+                        method: "DELETE",
+                        action: `/graph/edit/${graph.id}/requirement`,
+                        encType: "application/json"
+                    })
+                }
+                break;
+    
+            case "addRequirement":
+                fetcher.submit({
+                    knowledge_graph_id: graph.id,
+                    source: selectedTopics[0],
+                    destination: selectedTopics[1]
+                }, {
+                    method: "PUT",
                     action: `/graph/edit/${graph.id}/requirement`,
                     encType: "application/json"
                 })
-            }
-        } else if (event.type === "modifyTopic") {
-        
-            fetcher.submit(event.topic, { method: "PUT", action: `/graph/edit/${graph.id}/topic` })
+                break;
+    
+            case "modifyTopic":
+                fetcher.submit(event.topic, { method: "PUT", action: `/graph/edit/${graph.id}/topic` })
+                break;
+    
+            case "addPrerequisite":
+                fetcher.submit(event.prereq, { method: "PUT", action: `/graph/edit/${graph.id}/prereq`, encType: "application/json" })
+                break;
+    
+            case "addSatisfier":
+                fetcher.submit(event.satisfier, { method: "PUT", action: `/graph/edit/${graph.id}/satis`, encType: "application/json" })
+                break;
+    
+            case "removePrerequisite":
+                fetcher.submit(event, { method: "DELETE", action: `/graph/edit/${graph.id}/prereq`, encType: "application/json" })
+                break;
+    
+            case "removeSatisfier":
+                fetcher.submit(event, { method: "DELETE", action: `/graph/edit/${graph.id}/satis`, encType: "application/json" })
         }
     }
 
@@ -87,20 +109,6 @@ const EditGraph = () => {
             setOpenTopic(topic)
         }
     }, [graph.topics])
-
-    useEffect(() => {
-        const keyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                dispatch({ type: "clearSelected" })
-            }
-        }
-
-        document.addEventListener("keydown", keyDown)
-
-        return () => {
-            document.removeEventListener("keydown", keyDown)
-        }
-    }, [])
 
     const closeTopic = () => {
         if (openedTopicRef.current === null) {
@@ -116,7 +124,12 @@ const EditGraph = () => {
         return <></>
     }
 
-    return <div>
+    return <div onKeyDown={(event) => {
+            if (event.key === "Escape") {
+                console.log("well? anything ")
+                dispatch({ type: "clearSelected" })
+            }
+        }}>
         <SigmaContainer style={{ height: "90vh", width: "100vw" }}>
             <ControlsContainer>
                 <div className={`flex flex-col ${openedTopic != null ? "hidden" : ""}`}>
@@ -155,11 +168,14 @@ const EditGraph = () => {
 \
         </SigmaContainer>
         
-        <EditTopicModal 
-            objectives={graph.objectives.filter(prereq => prereq.topic === openedTopic?.id)} 
-            topic={openedTopic} 
-            closeModal={closeTopic} 
-            dispatch={injectedDispatch}/>
+        <EditContext.Provider value={{dispatch: injectedDispatch, topic: openedTopic}}>
+            <EditTopicModal 
+                objectives={graph.objectives.filter(prereq => prereq.topic === openedTopic?.id)}
+                satisfier={graph.satisfiers.find(satisfier => satisfier.topic === openedTopic?.id)?.objective}
+                topic={openedTopic} 
+                closeModal={closeTopic} 
+                />
+        </EditContext.Provider>
     </div>
 }
 

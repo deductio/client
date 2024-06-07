@@ -1,7 +1,8 @@
-import { GraphMap, KnowledgeGraph, Requirement, Topic } from "./model"
+import { createContext } from "react";
+import { GraphMap, KnowledgeGraph, ObjectivePrerequisite, ObjectiveSatisfier, Requirement, Topic } from "./model"
 import { produce } from 'immer';
 
-type GraphReduceAction = {
+export type GraphReduceAction = {
     type: "deleteTopic",
     node: number 
 } | {
@@ -18,6 +19,19 @@ type GraphReduceAction = {
     topic: Topic
 } | {
     type: "clearSelected"
+} | {
+    type: "addPrerequisite",
+    prereq: ObjectivePrerequisite
+} | {
+    type: "removePrerequisite",
+    node: number,
+    objective: number
+} | {
+    type: "addSatisfier",
+    satisfier: ObjectiveSatisfier
+} | {
+    type: "removeSatisfier",
+    node: number
 }
 
 interface EditGraphReducerState {
@@ -25,24 +39,26 @@ interface EditGraphReducerState {
     selectedTopics: number[]
 }
 
-const editGraphReducer = (state: EditGraphReducerState, action: GraphReduceAction) => produce(state, draft => {
-        if (action.type === "deleteTopic") {
+export const editGraphReducer = (state: EditGraphReducerState, action: GraphReduceAction) => produce(state, draft => {
+    switch (action.type) {
+        case "deleteTopic":
             draft.graph.topics = draft.graph.topics
-                .filter(topic => topic.id != action.node)
-            
+            .filter(topic => topic.id != action.node)
+        
             draft.graph.requirements = draft.graph.requirements
                 .filter(requirement => requirement[0] !== action.node && requirement[1] !== action.node)
 
             draft.selectedTopics = []
-
-        } else if (action.type === "deleteRequirement") {
-
+            break;
+        
+        case "deleteRequirement":
             draft.graph.requirements = draft.graph.requirements
                 .filter(requirement => requirement[0] !== draft.selectedTopics[0] || requirement[1] !== draft.selectedTopics[1])
 
             draft.selectedTopics = []
+            break;
 
-        } else if (action.type === "addRequirement") {
+        case "addRequirement":
             // TODO: cycle detection
             if (draft.selectedTopics.length == 2) {
 
@@ -50,7 +66,10 @@ const editGraphReducer = (state: EditGraphReducerState, action: GraphReduceActio
 
                 draft.selectedTopics = []
             }
-        } else if (action.type === "addTopic") {
+
+            break;
+
+        case "addTopic":
             draft.graph.topics.push({
                 id: 0,
                 knowledge_graph_id: draft.graph.id!,
@@ -58,21 +77,48 @@ const editGraphReducer = (state: EditGraphReducerState, action: GraphReduceActio
                 content: "",
                 subject: ""
             })
-        } else if (action.type === "toggleSelectTopic") {
+
+            break;
+
+        case "toggleSelectTopic":
             if (draft.selectedTopics.includes(action.node)) draft.selectedTopics = draft.selectedTopics.filter(topic => topic != action.node)
 
             else if ((draft.selectedTopics.length == 1 && draft.selectedTopics[0] != action.node) || draft.selectedTopics.length == 0) {
                 draft.selectedTopics.push(action.node)
             }
-        } else if (action.type === "modifyTopic"){ 
-            draft.graph.topics = draft.graph.topics.map(topic => topic.id === action.topic.id ? action.topic : topic)
-        } else if (action.type === "clearSelected") {
-            draft.selectedTopics = []
-        }
-    }
-)
 
-type ViewGraphReduceAction = {
+            break;
+
+        case "modifyTopic":
+            draft.graph.topics = draft.graph.topics.map(topic => topic.id === action.topic.id ? action.topic : topic)
+            break;
+        
+        case "clearSelected":
+            draft.selectedTopics = []
+            break;
+
+        case "addPrerequisite":
+            draft.graph.objectives.push(action.prereq)
+            break;
+
+        case "addSatisfier":
+            draft.graph.satisfiers.push({ ...action.satisfier, topic: action.satisfier.topic.id })
+            break;
+
+        case "removePrerequisite":
+            draft.graph.objectives = draft.graph.objectives.filter(prereq => prereq.topic !== action.node && prereq.objective.id !== action.objective)
+            break;
+
+        case "removeSatisfier":
+            draft.graph.satisfiers = draft.graph.satisfiers.filter(satisfier => satisfier.topic != action.node)
+    }
+})
+
+export const EditContext = createContext<{ dispatch: (event: GraphReduceAction) => void, topic: Topic | null }>({dispatch: (_: GraphReduceAction) => {}, topic: null})
+
+export const ViewContext = createContext((_: ViewGraphReduceAction) => {})
+
+export type ViewGraphReduceAction = {
     type: "addProgress",
     node: Topic
 } | {
@@ -80,7 +126,7 @@ type ViewGraphReduceAction = {
     node: Topic
 }
 
-const viewGraphReducer = (state: GraphMap, action: ViewGraphReduceAction) => produce(state, draft => {
+export const viewGraphReducer = (state: GraphMap, action: ViewGraphReduceAction) => produce(state, draft => {
     if (action.type === "addProgress") {
         if (!(draft.progress?.includes(action.node.id))) draft.progress?.push(action.node.id)
     } else if (action.type === "removeProgress") {
@@ -88,7 +134,7 @@ const viewGraphReducer = (state: GraphMap, action: ViewGraphReduceAction) => pro
     }
 })
 
-type GraphAPIAction = {
+export type GraphAPIAction = {
     type: "addTopic",
     topic: Topic
 } | {
@@ -101,5 +147,3 @@ type GraphAPIAction = {
     type: "deleteRequirement",
     requirementId: number
 }
-
-export { editGraphReducer, viewGraphReducer, type ViewGraphReduceAction, type GraphReduceAction, type GraphAPIAction }

@@ -1,4 +1,4 @@
-type Topic = {
+export type Topic = {
     knowledge_graph_id: string,
     title: string,
     id: number,
@@ -6,19 +6,24 @@ type Topic = {
     subject: string
 }
 
-type Requirement = {
+export type Requirement = {
     id: number,
     source: number,
     destination: number
 }
 
-type Objective = {
+export type Objective = {
     id: number,
     title: string,
     description: string
 }
 
-type KnowledgeGraph = {
+export type ResObjectiveSatisfier = {
+    topic: number,
+    objective: Objective
+}
+
+export type KnowledgeGraph = {
     id: string,
     name: string,
     description: string,
@@ -26,10 +31,11 @@ type KnowledgeGraph = {
     topics: Topic[],
     requirements: [number, number][],
     progress: number[] | undefined,
-    objectives: ObjectivePrerequisite[]
+    objectives: ObjectivePrerequisite[],
+    satisfiers: ResObjectiveSatisfier[]
 }
 
-type ObjectivePrerequisite = {
+export type ObjectivePrerequisite = {
     knowledge_graph_id: string,
     topic: number,
     objective: Objective,
@@ -37,19 +43,34 @@ type ObjectivePrerequisite = {
     suggested_topic: number
 }
 
-type GraphMap = {
+export type ObjectiveSatisfier = {
+    topic: Topic,
+    objective: Objective
+}
+
+export type GraphMap = {
     id?: string,
     topics: Topic[],
     requirements: [number, number][],
     progress: number[] | undefined
 }
 
-type FrontendUser = {
+export type PGTopicPair = {
+    graph: PreviewGraph,
+    topics: Topic[]
+}
+
+export type RecResult = {
+    results: PGTopicPair[],
+    objective: Objective
+}
+
+export type FrontendUser = {
     username: string,
     avatar: string
 }
 
-type SearchResultGraph = {
+export type SearchResultGraph = {
     id: string,
     name: string,
     description: string,
@@ -58,15 +79,13 @@ type SearchResultGraph = {
     liked: boolean
 }
 
-type PreviewGraph = {
+export type PreviewGraph = {
     id: string,
     name: string,
     description: string
 }
 
-type User = {
+export type User = {
     user: FrontendUser
     graphs: SearchResultGraph[]
 }
-
-export type { KnowledgeGraph, Topic, Requirement, SearchResultGraph, User, FrontendUser, PreviewGraph, GraphMap, ObjectivePrerequisite, Objective }

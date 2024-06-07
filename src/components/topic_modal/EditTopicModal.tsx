@@ -1,22 +1,33 @@
 import Modal from "react-modal"
-import { useState, ChangeEvent, useRef, MutableRefObject, useEffect } from "react"
-import { LexicalEditor } from "lexical"
+import { useRef, useState } from "react"
 import 'katex/dist/katex.min.css' 
-import TopicViewer from "../lexical/LexicalTopic"
-import ObjectiveList from "./ObjectiveList"
-import { GraphReduceAction } from "../../api/graphOps"
-import { ObjectivePrerequisite, Topic } from "../../api/model"
+import { Objective, ObjectivePrerequisite, Topic } from "../../api/model"
+import TopicEditor from "./TopicEditor"
+import { CSSTransition, SwitchTransition } from "react-transition-group"
+import ObjectiveSearch from "./ObjectiveSearch"
+import { useFetcher } from "react-router-dom"
+import ObjectiveReconciliation from "./ObjectiveReconciliation"
+import ObjectiveCreation from "./ObjectiveCreation"
 
-interface EditTopicModalProps {
+export type EditTopicModalState = "topic" | "prereq" | "satis" | "creation" | "reconcile"
+
+export interface EditTopicModalProps {
     topic: Topic | null,
     objectives: ObjectivePrerequisite[],
-    dispatch: (event: GraphReduceAction) => void
+    satisfier?: Objective,
     closeModal: () => void,
 }
 
 const EditTopicModal = (props: EditTopicModalProps) => {
 
-    const [title, setTitle] = useState(props.topic?.title || "")
+    const [state, setState] = useState<EditTopicModalState>("topic")
+    const prereqFetcher = useFetcher()
+
+    const topicEditorRef = useRef(null)
+    const objPrereqRef = useRef(null)
+    const objSatisRef = useRef(null)
+    const objReconcileRef = useRef(null)
+    const objCreationRef = useRef(null)
 
     const styles = {
         content: {
@@ -24,47 +35,42 @@ const EditTopicModal = (props: EditTopicModalProps) => {
         }
     }
 
-    useEffect(() => {
-        if (props.topic?.title) setTitle(props.topic.title)
-    }, [props.topic?.title])
+    let body, mainRef;
 
-    const editor: MutableRefObject<LexicalEditor | null> = useRef<LexicalEditor | null>(null)
+    switch (state) {
+        case "topic":
+            mainRef = topicEditorRef
+            body = <TopicEditor {...props} transition={setState} ref={mainRef}/>
+            break;
+        
+        case "prereq":
+            mainRef = objPrereqRef
+            body = <ObjectiveSearch topic={props.topic!} mode="prereq" fetcher={prereqFetcher} ref={mainRef} reconcile={() => setState("reconcile")}/>
+            break;
 
-    const updateTitle = (e: ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value)
+        case "satis":
+            mainRef = objSatisRef
+            body = <ObjectiveSearch mode="satisfier" topic={props.topic!} fetcher={prereqFetcher} ref={mainRef} reconcile={() => setState("topic")}/>
+            break;
+
+        case "reconcile":
+            mainRef = objReconcileRef
+            body = <ObjectiveReconciliation fetcher={prereqFetcher} reconcile={() => setState("topic")}/>
+            break;
+
+        case "creation":
+            mainRef = objCreationRef
+            body = <ObjectiveCreation finish={() => setState("topic")}/>
+            break;
+            
     }
 
-    return <Modal isOpen={props.topic !== null} style={styles} onRequestClose={props.closeModal}>
-        <div>
-            {(props.topic !== null) ? 
-                <>
-                <span className="material-symbols-rounded float-right" onClick={props.closeModal}>close</span>
-                <div className="text-center p-2"><input className="text-2xl text-center" type="text" value={title} onChange={updateTitle} name="title"></input></div>
-                <TopicViewer mode="edit" state={props.topic.content === "" ? 
-                    '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}' 
-                    : props.topic.content} editorRef={editor}/>
-
-                <ObjectiveList objectives={props.objectives}/>
-    
-                <div className="flex flex-center justify-center p-4">
-                    <button className="bg-indigo-600 rounded text-white p-4" onClick={_ => {
-                        props.dispatch({ type: 'modifyTopic', topic: {
-                            ...(props.topic!),
-                            title,
-                            content: JSON.stringify(editor.current?.getEditorState().toJSON()),
-                        } })
-        
-                        props.closeModal()
-                    }}>Save topic!</button>
-                </div>
-                
-                </>
-                
-
-                : <></>
-            }
-        </div>
-            
+    return <Modal isOpen={props.topic !== null} style={styles} onRequestClose={() => { setState("topic"); props.closeModal() }}>
+        <SwitchTransition>
+            <CSSTransition nodeRef={mainRef} timeout={300} classNames="main-app" key={state}>
+                {body}
+            </CSSTransition> 
+        </SwitchTransition> 
     </Modal>
 }
 

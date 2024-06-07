@@ -1,6 +1,5 @@
 import Modal from "react-modal"
 import { Topic } from "../../api/model"
-import { Form } from "react-router-dom"
 
 type LockedTopicModalProps = {
     topic: Topic | null
