@@ -22,13 +22,13 @@ export default [{
                         id: number | undefined,
                         knowledge_graph_id: FormDataEntryValue,
                         content: FormDataEntryValue,
-                        subject: FormDataEntryValue,
+                        description: FormDataEntryValue,
                         title: FormDataEntryValue
                     } = {
                         id: Number(form_data.id),
                         knowledge_graph_id: form_data.knowledge_graph_id,
                         content: form_data.content,
-                        subject: form_data.subject,
+                        description: form_data.description,
                         title: form_data.title
                     } 
 

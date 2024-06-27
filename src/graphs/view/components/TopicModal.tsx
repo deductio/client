@@ -5,6 +5,7 @@ import LexicalTopic from "../../components/lexical/LexicalTopic"
 import { LexicalEditor } from "lexical"
 import { useRef } from "react"
 import { ViewGraphReduceAction } from "../lib/ViewState"
+import { X } from "lucide-react"
 
 interface TopicModalProps {
     topic: Topic | null,
@@ -18,7 +19,7 @@ const TopicModal = (props: TopicModalProps & { completed: boolean | undefined })
 
         return <Modal isOpen={props.topic !== null} onRequestClose={props.closeModal}>
             <div>
-                <span className="material-symbols-rounded float-right" onClick={props.closeModal}>close</span>
+                <X onClick={props.closeModal} className="float-right"/>
                 {(props.topic !== null) ? 
                     <><div className="text-center p-2"><h1 className="text-2xl">{props.topic.title}</h1></div>
                 <LexicalTopic mode="view" state={props.topic.content === "" ? 

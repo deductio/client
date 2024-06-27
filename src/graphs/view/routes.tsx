@@ -3,7 +3,7 @@ import { Params } from "react-router"
 import { FullRequest } from "../../utilities/model"
 import ViewGraph from "./ViewGraph"
 
-export default [    {
+export default [{
     path: "graph/view/:username/:name",
     element: <ViewGraph/>,
     loader: async ({ params }: { params: Params<string> }) => {

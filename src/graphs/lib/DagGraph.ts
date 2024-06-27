@@ -3,6 +3,103 @@ import dagre from "dagre";
 import { DirectedGraph } from "graphology";
 import { useEffect } from "react";
 import { GraphMap } from "../../utilities/model";
+import { PlainObject } from "sigma/types";
+
+/**
+ * This function draw in the input canvas 2D context a rectangle.
+ * It only deals with tracing the path, and does not fill or stroke.
+ * 
+ * Taken from the Sigma.js main demo, licensed under the MIT license.
+ */
+export function drawRoundRect(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number,
+  ): void {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  }
+
+const drawHover = (context: CanvasRenderingContext2D, data: PlainObject, settings: PlainObject): void => {
+    if (!data.label) return
+
+    context.font = `${settings.labelWeight} ${settings.labelSize}px ${settings.labelFont}`
+    const diameter = data.size * 2
+
+    const metrics = context.measureText(data.label) 
+    const width = Math.max(metrics.width + diameter + 11 + (settings.labelSize / 2), 200)
+
+    const maxWidth = Math.min(width - diameter, 200)
+    let actualMaxWidth = Math.min(width - diameter, 200)
+    const descriptionLines = []
+    const descriptionWords = data.description.split(" ")
+    let currentLine = ""
+    let currentWidth = 0
+    let currentIndex = 0
+
+    context.font = `${settings.labelWeight} ${settings.labelSize - 2}px ${settings.labelFont}`
+
+    while (true) {
+
+        while (currentWidth < maxWidth && currentIndex < descriptionWords.length) {
+            currentLine += descriptionWords[currentIndex++] + " "
+            currentWidth = context.measureText(currentLine).width
+        }
+
+        const currentSplitLine = currentLine.split(" ")
+        currentSplitLine.pop()
+        if (currentSplitLine.length == 1) {
+            // nothing to be done, move on
+            descriptionLines.push(currentLine)
+            actualMaxWidth = Math.max(currentWidth, maxWidth)
+        } else {
+            
+            if (currentIndex < descriptionWords.length) {
+                currentIndex--
+                currentSplitLine.pop()
+            }
+            
+            descriptionLines.push(currentSplitLine.join(" "))
+            
+        }
+
+        if (currentIndex == descriptionWords.length) break
+
+        currentWidth = 0
+        currentLine = ""
+    }
+
+    const height = diameter + 8 + (settings.labelSize - 2) * descriptionLines.length + 4
+
+    context.fillStyle = "#fff"
+    drawRoundRect(context, data.x - data.size - 4, data.y - data.size - 4, width, height, 4)
+    context.fill()
+    
+    context.fillStyle = "#000"
+    drawRoundRect(context, data.x - data.size - 4, data.y - data.size - 4, width, height, 4)
+    context.stroke()
+
+    context.font = `${settings.labelWeight} ${settings.labelSize}px ${settings.labelFont}`
+
+    context.fillText(data.label, data.x + data.size + 3, data.y + settings.labelSize / 3)
+
+    context.font = `${settings.labelWeight} ${settings.labelSize - 2}px ${settings.labelFont}`
+    descriptionLines.forEach((line, i) => {
+        context.fillText(line, data.x - data.size + 3, data.y + settings.labelSize + data.size + (settings.labelSize - 2) * i)
+    })
+}
 
 interface DagGraphProps {
     graph: GraphMap,
@@ -22,8 +119,10 @@ const DagGraph = (props: DagGraphProps) => {
     const sigma = useSigma()
 
     sigma.setSetting("labelFont", "IBM Plex Sans")
+    sigma.setSetting("defaultDrawNodeHover", drawHover)
     
     useEffect(() => {
+
         const graph: DirectedGraph = new DirectedGraph() // visualization
         const dag = new dagre.graphlib.Graph() // layout control
 
@@ -37,6 +136,7 @@ const DagGraph = (props: DagGraphProps) => {
                 label: topic.title,
                 size: 20,
                 color: "#6366f1",
+                description: topic.description
             })
 
             dag.setNode(String(topic.id), {

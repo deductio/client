@@ -1,5 +1,5 @@
 import Modal from "react-modal"
-import { useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import 'katex/dist/katex.min.css' 
 import { Objective, ObjectivePrerequisite, Topic } from "../../../../utilities/model"
 import TopicEditor from "./TopicEditor"
@@ -8,6 +8,7 @@ import ObjectiveSearch from "../objectives/ObjectiveSearch"
 import { useFetcher } from "react-router-dom"
 import ObjectiveReconciliation from "../objectives/ObjectiveReconciliation"
 import ObjectiveCreation from "../objectives/ObjectiveCreation"
+import { EditContext } from "../../lib/EditState"
 
 export type EditTopicModalState = "topic" | "prereq" | "satis" | "creation" | "reconcile"
 
@@ -28,6 +29,8 @@ const EditTopicModal = (props: EditTopicModalProps) => {
 
     const [state, setState] = useState<EditTopicModalState>("topic")
     const prereqFetcher = useFetcher()
+
+    const { imageDialogOpen, setImageDialogOpen, youtubeDialogOpen, setYoutubeDialogOpen } = useContext(EditContext).toolbar
 
     const topicEditorRef = useRef(null)
     const objPrereqRef = useRef(null)
@@ -71,7 +74,15 @@ const EditTopicModal = (props: EditTopicModalProps) => {
             
     }
 
-    return <Modal isOpen={props.topic !== null} style={styles} onRequestClose={() => { setState("topic"); props.closeModal() }}>
+    return <Modal isOpen={props.topic !== null} style={styles} onRequestClose={e => { 
+        if ("keyCode" in e && (youtubeDialogOpen || imageDialogOpen)) {
+            setImageDialogOpen(false)
+            setYoutubeDialogOpen(false)
+        } else {
+            setState("topic")
+            props.closeModal()
+        }
+     }}>
         <SwitchTransition>
             <CSSTransition nodeRef={mainRef} timeout={300} classNames="main-app" key={state}>
                 {body}

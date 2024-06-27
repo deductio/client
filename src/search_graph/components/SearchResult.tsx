@@ -1,6 +1,7 @@
 import { useFetcher, Link } from "react-router-dom"
 import { SearchResultGraph } from "../../utilities/model";
 import Cookies from "js-cookie"
+import { Star } from "lucide-react";
 
 const SearchResult = ({ graph, timerange }: { graph: SearchResultGraph, timerange?: string }) => {
     let range;
@@ -27,7 +28,7 @@ const SearchResult = ({ graph, timerange }: { graph: SearchResultGraph, timerang
     return <div className="m-4">
         <h2 className="font-semibold text-2xl"><Link to={`/graph/view/${graph.id}`}>{graph.name}</Link></h2>
         <i className="float-right flex flex-row">
-            <span className="material-symbols-rounded">star</span>
+            <Star/>
             {graph.like_count} {graph.like_count == 1 ? "like" : "likes"} {range}
         </i>
         <i className="flex flex-row">by <Link className="flex flex-row mx-1" to={`/users/${graph.user.username}`}>

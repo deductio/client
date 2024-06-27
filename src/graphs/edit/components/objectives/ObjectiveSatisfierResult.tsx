@@ -1,3 +1,4 @@
+import { MoveRight } from "lucide-react"
 import { Objective, Topic } from "../../../../utilities/model"
 import { EditContext } from "../../lib/EditState"
 import { useContext } from "react"
@@ -22,7 +23,7 @@ const ObjectiveSatisfierResult = (props: Props) => {
 
     return <div className="m-4 grid" style={{ "gridTemplateColumns": "64px 1fr 1fr 1fr 1fr 1fr" }}>
         <div className="h-6 w-6 self-center m-4 bg-indigo-600 rounded-full text-white">
-            <button className="material-symbols-rounded font-extrabold" onClick={() => {
+            <button className="font-extrabold" onClick={() => {
                 dispatch({
                     type: "addSatisfier",
                     satisfier: {
@@ -32,7 +33,7 @@ const ObjectiveSatisfierResult = (props: Props) => {
                 })
 
                 props.reconcile()
-            }}>arrow_forward</button>
+            }}><MoveRight/></button>
         </div>
 
         <h2 className="font-semibold text-2xl col-span-5">{props.result.title}</h2>

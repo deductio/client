@@ -1,6 +1,5 @@
-import { $applyNodeReplacement, DecoratorNode, EditorConfig, LexicalNode, NodeKey } from "lexical";
+import { $applyNodeReplacement, DecoratorNode, EditorConfig, LexicalNode, NodeKey, Spread, SerializedLexicalNode, LexicalEditor } from "lexical";
 import { ReactNode } from "react";
-import type { Spread, SerializedLexicalNode } from "lexical"
 import EquationComponent from "./EquationComponent";
 
 export type SerializedEquationNode = Spread<{
@@ -90,8 +89,8 @@ export class EquationNode extends DecoratorNode<ReactNode> {
         return prevNode.__inline !== this.__inline || prevNode.__equation !== this.__equation
     }
 
-    decorate(): ReactNode {
-        return <EquationComponent _equation={this.getEquation()} _inline={this.getInline()} nodeKey={this.getKey()} _editing={this.getEditing()}/>
+    decorate(editor: LexicalEditor): ReactNode {
+        return <EquationComponent equation={this.getEquation()} inline={this.getInline()} nodeKey={this.getKey()} editing={this.getEditing()} editable={editor.isEditable()}/>
     }
 
     override exportJSON(): SerializedEquationNode {
@@ -119,5 +118,5 @@ export function $createEquationNode(equation: string, inline: boolean): Equation
 export function $isEquationNode(
     node: LexicalNode | null | undefined,
   ): node is EquationNode {
-    return node?.__type === "equation";
+    return node?.getType() === "equation";
   }

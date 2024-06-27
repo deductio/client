@@ -5,6 +5,7 @@ import { LexicalEditor } from "lexical"
 import LexicalTopic from "../../../components/lexical/LexicalTopic"
 import { EditContext } from "../../lib/EditState"
 import { EditTopicModalProps, EditTopicModalState } from "./EditTopicModal"
+import { X } from "lucide-react"
 
 /**
  * The main UI for editing a topic, contains the Lexical rich text editor, the list of all required objectives,
@@ -13,11 +14,13 @@ import { EditTopicModalProps, EditTopicModalState } from "./EditTopicModal"
 const TopicEditor = forwardRef((props: EditTopicModalProps & { transition: (arg0: EditTopicModalState) => void }, ref: ForwardedRef<HTMLDivElement>) => {
 
     const [title, setTitle] = useState(props.topic?.title || "")
+    const [description, setDescription] = useState(props.topic?.description || "")
     const { dispatch } = useContext(EditContext)
     
     useEffect(() => {
         if (props.topic?.title) setTitle(props.topic.title)
-    }, [props.topic?.title])
+        if (props.topic?.description) setDescription(props.topic.description)
+    }, [props.topic?.title, props.topic?.description])
 
     const editor: MutableRefObject<LexicalEditor | null> = useRef<LexicalEditor | null>(null)
 
@@ -28,10 +31,17 @@ const TopicEditor = forwardRef((props: EditTopicModalProps & { transition: (arg0
     return <div ref={ref}>
         {(props.topic !== null) ? 
             <>
-            <span className="material-symbols-rounded float-right" onClick={props.closeModal}>close</span>
+            <X onClick={props.closeModal} className="float-right"/>
             <div className="text-center p-2">
                 <input className="text-2xl text-center" type="text" value={title} onChange={updateTitle} name="title"></input>
             </div>
+
+            <div className="flex flex-row items-center">
+                <p>Description</p>
+                <textarea className="grow m-2 border resize-none p-2" value={description} onChange={e => setDescription(e.target.value)}></textarea>
+            </div>
+
+            <hr className="bg-black m-4"/>
 
             <LexicalTopic mode="edit" state={props.topic.content === "" ? 
                 '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}' 
@@ -50,6 +60,7 @@ const TopicEditor = forwardRef((props: EditTopicModalProps & { transition: (arg0
                     dispatch({ type: 'modifyTopic', topic: {
                         ...(props.topic!),
                         title,
+                        description,
                         content: JSON.stringify(editor.current?.getEditorState().toJSON()),
                     } })
 

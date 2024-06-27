@@ -8,7 +8,7 @@ export type Topic = {
     title: string,
     id: number,
     content: string,
-    subject: string
+    description: string
 }
 
 /**

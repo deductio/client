@@ -1,6 +1,8 @@
-import { createContext } from "react";
+import { Dispatch, SetStateAction, createContext, useEffect, useReducer, useState } from "react";
 import { KnowledgeGraph, ObjectivePrerequisite, ObjectiveSatisfier, Topic } from "../../../utilities/model"
 import { produce } from 'immer';
+import { useLoaderData } from "react-router";
+import { useFetcher } from "react-router-dom";
 
 /**
  * The actions that can be performed on a writable graph.
@@ -9,7 +11,8 @@ export type GraphReduceAction = {
     type: "deleteTopic",
     node: number 
 } | {
-    type: "addTopic"
+    type: "addTopic",
+    topic?: Topic
 } | {
     type: "addRequirement"
 } | {
@@ -40,7 +43,7 @@ export type GraphReduceAction = {
 /**
  * The current state of the writable graph.
  */
-interface EditGraphReducerState {
+export interface EditGraphReducerState {
     graph: KnowledgeGraph,
     selectedTopics: number[]
 }
@@ -84,12 +87,12 @@ export const editGraphReducer = (state: EditGraphReducerState, action: GraphRedu
             break;
 
         case "addTopic":
-            draft.graph.topics.push({
+            draft.graph.topics.push(action.topic ? action.topic : {
                 id: 0,
                 knowledge_graph_id: draft.graph.id!,
                 title: "<new node>",
                 content: "",
-                subject: ""
+                description: ""
             })
 
             break;
@@ -128,8 +131,108 @@ export const editGraphReducer = (state: EditGraphReducerState, action: GraphRedu
     }
 })
 
+export interface ToolbarProps {
+    imageDialogOpen: boolean,
+    setImageDialogOpen: Dispatch<SetStateAction<boolean>>,
+    youtubeDialogOpen: boolean,
+    setYoutubeDialogOpen: Dispatch<SetStateAction<boolean>>
+}
+
 /**
  * A Context that provides the graph edit reducer function (defined above, but wrapped before passing), as well as the currently opened topic
  * to child components of EditGraph to prevent deeply passing props.
  */
-export const EditContext = createContext<{ dispatch: (event: GraphReduceAction) => void, topic: Topic | null }>({dispatch: (_: GraphReduceAction) => {}, topic: null})
+export const EditContext = createContext<{ dispatch: (event: GraphReduceAction) => void, topic: Topic | null, toolbar: ToolbarProps }>(
+    {dispatch: (_: GraphReduceAction) => {}, topic: null, toolbar: {
+        imageDialogOpen: false,
+        setImageDialogOpen: (_) => {},
+        setYoutubeDialogOpen: (_) => {},
+        youtubeDialogOpen: false
+    }}
+)
+
+export const useEditGraph = (): [EditGraphReducerState, Dispatch<GraphReduceAction | null>] => {
+    const dataGraph = useLoaderData() as KnowledgeGraph
+    const fetcher = useFetcher()
+
+    const [event, setEvent] = useState<GraphReduceAction | null>(null)
+
+    const curriedGraphReducer = produce(editGraphReducer)
+    const [{ graph, selectedTopics }, dispatch] = useReducer(curriedGraphReducer, { graph: dataGraph, selectedTopics: [] })
+
+    useEffect(() => {
+        if (fetcher.formAction == `/graph/edit/${graph.id}/topic` && fetcher.formMethod == "put" && fetcher.data.knowledge_graph_id
+            && !graph.topics.some(topic => topic.id == fetcher.data.id)
+        ) {
+            dispatch({
+                type: "addTopic",
+                topic: fetcher.data
+            })
+        }
+    }, [fetcher.data])
+
+    useEffect(() => {
+        if (event == null) return
+
+        if (event.type === "deleteTopic") {
+            event.node = selectedTopics[0]
+        }
+
+        dispatch(event)
+
+        switch (event.type) {
+            case "deleteTopic":
+                fetcher.submit({ id: event.node }, {
+                    method: "DELETE",
+                    action: `/graph/edit/${graph.id}/topic`,
+                    encType: "application/json"
+                })
+                break;
+            
+            case "deleteRequirement":
+                const requirement = graph.requirements.find(req => req[1] === selectedTopics[1] && req[0] === selectedTopics[0])
+            
+                if (requirement !== undefined) {
+                    fetcher.submit({ src: requirement[0], dest: requirement[1] }, {
+                        method: "DELETE",
+                        action: `/graph/edit/${graph.id}/requirement`,
+                        encType: "application/json"
+                    })
+                }
+                break;
+    
+            case "addRequirement":
+                fetcher.submit({
+                    knowledge_graph_id: graph.id,
+                    source: selectedTopics[0],
+                    destination: selectedTopics[1]
+                }, {
+                    method: "PUT",
+                    action: `/graph/edit/${graph.id}/requirement`,
+                    encType: "application/json"
+                })
+                break;
+    
+            case "modifyTopic":
+                fetcher.submit(event.topic, { method: "PUT", action: `/graph/edit/${graph.id}/topic` })
+                break;
+    
+            case "addPrerequisite":
+                fetcher.submit(event.prereq, { method: "PUT", action: `/graph/edit/${graph.id}/prereq`, encType: "application/json" })
+                break;
+    
+            case "addSatisfier":
+                fetcher.submit(event.satisfier, { method: "PUT", action: `/graph/edit/${graph.id}/satis`, encType: "application/json" })
+                break;
+    
+            case "removePrerequisite":
+                fetcher.submit(event, { method: "DELETE", action: `/graph/edit/${graph.id}/prereq`, encType: "application/json" })
+                break;
+    
+            case "removeSatisfier":
+                fetcher.submit(event, { method: "DELETE", action: `/graph/edit/${graph.id}/satis`, encType: "application/json" })
+        }
+    }, [event])
+
+    return [{ graph, selectedTopics }, setEvent]
+}

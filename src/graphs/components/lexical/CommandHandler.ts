@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { 
-    createCommand, LexicalCommand, TextFormatType, COMMAND_PRIORITY_EDITOR, COMMAND_PRIORITY_HIGH, 
+    createCommand, TextFormatType, COMMAND_PRIORITY_EDITOR, COMMAND_PRIORITY_HIGH, 
     $getSelection, $isRangeSelection, RangeSelection, $insertNodes
 } from "lexical"
 import { TRANSFORMERS, $convertToMarkdownString } from "@lexical/markdown"
@@ -8,14 +8,20 @@ import { mergeRegister } from "@lexical/utils"
 import { useEffect } from "react"
 import { $createEquationNode } from "./EquationNode"
 import { $createCodeNode } from "@lexical/code"
+import { $createImageNode } from "./ImageNode"
+import { $createYoutubeNode } from "./YoutubeNode"
 
-const FORMAT_TEXT_COMMAND: LexicalCommand<TextFormatType> = createCommand()
+export const FORMAT_TEXT_COMMAND = createCommand<TextFormatType>()
 
-const MARKDOWN_EXPORT: LexicalCommand<void> = createCommand()
+export const MARKDOWN_EXPORT = createCommand()
 
-const INSERT_MATH_COMMAND: LexicalCommand<void> = createCommand()
+export const INSERT_MATH_COMMAND = createCommand()
 
-const INSERT_CODE_BLOCK_COMMAND: LexicalCommand<void> = createCommand()
+export const INSERT_CODE_BLOCK_COMMAND = createCommand()
+
+export const INSERT_IMAGE_COMMAND = createCommand<string>()
+
+export const INSERT_YOUTUBE_COMMAND = createCommand<string>()
 
 /**
  * A Lexical React plugin that handles events relating to text input
@@ -61,6 +67,21 @@ const CommandHandler = () => {
                 $insertNodes([code])
 
                 return true
+            }, COMMAND_PRIORITY_EDITOR),
+
+            editor.registerCommand(INSERT_IMAGE_COMMAND, link => {
+                const image = $createImageNode(link, 0)
+                $insertNodes([image])
+
+                return true
+            }, COMMAND_PRIORITY_EDITOR),
+
+            editor.registerCommand(INSERT_YOUTUBE_COMMAND, id => {
+                const yt = $createYoutubeNode(id, undefined, undefined)
+                $insertNodes([yt])
+
+                return true
+                
             }, COMMAND_PRIORITY_EDITOR)
         )
     }, [editor])
@@ -70,5 +91,3 @@ const CommandHandler = () => {
 }
 
 export default CommandHandler
-
-export { FORMAT_TEXT_COMMAND, MARKDOWN_EXPORT, INSERT_MATH_COMMAND, INSERT_CODE_BLOCK_COMMAND }

@@ -18,6 +18,8 @@ import { MutableRefObject } from "react"
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin"
 import THEME from "./theme"
 import { EquationNode } from "./EquationNode"
+import { ImageNode } from "./ImageNode"
+import { YoutubeNode } from "./YoutubeNode"
 
 /**
  * The rich text editor for editing a topic.
@@ -36,6 +38,8 @@ const LexicalTopic = ({ state, editorRef, mode }: { state: string, editorRef: Mu
             QuoteNode,
             LinkNode,
             EquationNode,
+            ImageNode,
+            YoutubeNode
         ],
         editable: mode === "edit",
         editorState: state,

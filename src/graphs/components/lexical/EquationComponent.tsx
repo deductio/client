@@ -4,12 +4,18 @@ import { $getNodeByKey } from "lexical"
 import KatexRenderer from "./KatexRender"
 import { $isEquationNode } from "./EquationNode"
 
+interface EquationComponentProps { 
+    equation: string, 
+    inline: boolean, 
+    editing: boolean, 
+    nodeKey: string,
+    editable: boolean
+}
+
 /**
  * The corresponding JSX component for EquationNode.
  */
-const EquationComponent = ({ _equation, _inline, _editing, nodeKey }
-    : 
-    { _equation: string,_inline: boolean, _editing: boolean, nodeKey: string }) => {
+const EquationComponent = ({ equation: _equation, inline: _inline, editing: _editing, nodeKey, editable }: EquationComponentProps) => {
 
     const [editor] = useLexicalComposerContext()
 
@@ -40,7 +46,7 @@ const EquationComponent = ({ _equation, _inline, _editing, nodeKey }
     }, [editor, inline, equation, nodeKey])
 
     return !editing
-        ? <KatexRenderer equation={equation} inline={inline} onDoubleClick={() => setEditing(true)}/>
+        ? <KatexRenderer equation={equation} inline={inline} onDoubleClick={() => editable ? setEditing(true) : null}/>
         : <div className="bg-gray-200 m-2 p-2 border-0" tabIndex={1}>
             <div className="float-end">
                 <div className="text-sm rounded-lg border border-neutral-900 flex flex-row justify-between text-center overflow-hidden">
