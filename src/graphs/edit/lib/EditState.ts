@@ -38,6 +38,11 @@ export type GraphReduceAction = {
 } | {
     type: "removeSatisfier",
     node: number
+} | {
+    type: "commitTopic",
+    id: number
+} | {
+    type: "clearTempNode"
 }
 
 /**
@@ -128,6 +133,20 @@ export const editGraphReducer = (state: EditGraphReducerState, action: GraphRedu
 
         case "removeSatisfier":
             draft.graph.satisfiers = draft.graph.satisfiers.filter(satisfier => satisfier.topic != action.node)
+            break
+
+        case "commitTopic":
+            draft.graph.topics = draft.graph.topics.map(topic => {
+                if (topic.id != 0) return topic
+                else return {
+                    ...topic,
+                    id: action.id
+                }
+            })
+            break
+
+        case "clearTempNode":
+            draft.graph.topics = draft.graph.topics.filter(topic => topic.id != 0)
     }
 })
 
@@ -163,18 +182,15 @@ export const useEditGraph = (): [EditGraphReducerState, Dispatch<GraphReduceActi
     useEffect(() => {
         if (fetcher.formAction == `/graph/edit/${graph.id}/topic` && fetcher.formMethod == "put" && fetcher.data.knowledge_graph_id
             && !graph.topics.some(topic => topic.id == fetcher.data.id)
-        ) {
-            dispatch({
-                type: "addTopic",
-                topic: fetcher.data
-            })
-        }
+        ) 
+            dispatch({ type: "commitTopic", id: fetcher.data.id })
+        
     }, [fetcher.data])
 
     useEffect(() => {
         if (event == null) return
 
-        if (event.type === "deleteTopic") {
+        if (event.type === "deleteTopic" && event.node == undefined) {
             event.node = selectedTopics[0]
         }
 
@@ -182,11 +198,12 @@ export const useEditGraph = (): [EditGraphReducerState, Dispatch<GraphReduceActi
 
         switch (event.type) {
             case "deleteTopic":
-                fetcher.submit({ id: event.node }, {
-                    method: "DELETE",
-                    action: `/graph/edit/${graph.id}/topic`,
-                    encType: "application/json"
-                })
+                if (event.node != 0)
+                    fetcher.submit({ id: event.node }, {
+                        method: "DELETE",
+                        action: `/graph/edit/${graph.id}/topic`,
+                        encType: "application/json"
+                    })
                 break;
             
             case "deleteRequirement":

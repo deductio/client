@@ -24,18 +24,20 @@ const EditGraph = () => {
     const openTopic = useCallback((id: number) => {
         const topic = graph.topics.find(topic => topic.id === id)
 
-        if (topic) {
+        if (topic) 
             setOpenTopic(topic)
-        }
+        
     }, [graph.topics])
 
-    const closeTopic = useCallback(() => {
-        if (openedTopic == null) {
-            return
-        } else if (openedTopic.id === 0) {
-            dispatch({ type: "deleteTopic", node: 0 })
-        }
+    const closeTopic = useCallback((save: boolean) => {
 
+        console.log(openedTopic)
+
+        if (openedTopic == null) 
+            return
+        else if (openedTopic.id == 0 && !save) 
+            dispatch({ type: "clearTempNode" })
+        
         if (imageDialogOpen || youtubeDialogOpen) {
             setImageDialogOpen(false)
             setYoutubeDialogOpen(false)
@@ -56,9 +58,9 @@ const EditGraph = () => {
     }
 
     return <div onKeyDown={(event) => {
-            if (event.key === "Escape") {
+            if (event.key === "Escape") 
                 dispatch({ type: "clearSelected" })
-            }
+            
         }}>
         <SigmaContainer style={{ height: "90vh", width: "100vw" }}>
             <ControlsContainer>
@@ -75,7 +77,7 @@ const EditGraph = () => {
                         <button 
                             className={`${selectedTopics.length == 1 ? "bg-indigo-600" : "bg-gray-400"} rounded text-white p-2 m-1`}
                             disabled={selectedTopics.length != 1}
-                            onClick={() => dispatch({ type: "deleteTopic", node: 0 })}>Delete Topic</button>
+                            onClick={() => dispatch({ type: "deleteTopic", node: selectedTopics[0] })}>Delete Topic</button>
                     </div>
                     <div className="flex">
                         <button 

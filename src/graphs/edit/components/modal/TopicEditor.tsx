@@ -31,7 +31,7 @@ const TopicEditor = forwardRef((props: EditTopicModalProps & { transition: (arg0
     return <div ref={ref}>
         {(props.topic !== null) ? 
             <>
-            <X onClick={props.closeModal} className="float-right"/>
+            <X onClick={() => props.closeModal(false)} className="float-right"/>
             <div className="text-center p-2">
                 <input className="text-2xl text-center" type="text" value={title} onChange={updateTitle} name="title"></input>
             </div>
@@ -64,7 +64,7 @@ const TopicEditor = forwardRef((props: EditTopicModalProps & { transition: (arg0
                         content: JSON.stringify(editor.current?.getEditorState().toJSON()),
                     } })
 
-                    props.closeModal()
+                    props.closeModal(true)
                 }}>Save topic!</button>
             </div>
             </>

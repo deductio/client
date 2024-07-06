@@ -16,7 +16,7 @@ export interface EditTopicModalProps {
     topic: Topic | null,
     objectives: ObjectivePrerequisite[],
     satisfier?: Objective,
-    closeModal: () => void,
+    closeModal: (arg0: boolean) => void,
 }
 
 /**
@@ -80,7 +80,7 @@ const EditTopicModal = (props: EditTopicModalProps) => {
             setYoutubeDialogOpen(false)
         } else {
             setState("topic")
-            props.closeModal()
+            props.closeModal(false)
         }
      }}>
         <SwitchTransition>
