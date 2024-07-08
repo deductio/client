@@ -4,22 +4,22 @@ import katex from 'katex'
 /**
  * A decorator component that renders KaTeX math provided to it.
  */
-const KatexRenderer = ({ equation, inline, onDoubleClick }: { equation: string, inline: boolean, onDoubleClick: () => void }) => {
-    const katexRef = useRef<HTMLElement>(null)
+const KatexRenderer = ({ equation, inline, onDoubleClick }: { equation: string, inline: boolean, onDoubleClick: () => void }): JSX.Element => {
+  const katexRef = useRef<HTMLElement>(null)
 
-    useEffect(() => {
-        if (katexRef.current !== null) {
-            katex.render(equation, katexRef.current, {
-                displayMode: !inline,
-                trust: false,
-                output: "html"
-            })
-        }
-    }, [equation, inline])
+  useEffect(() => {
+    if (katexRef.current !== null) {
+      katex.render(equation, katexRef.current, {
+        displayMode: !inline,
+        trust: false,
+        output: 'html'
+      })
+    }
+  }, [equation, inline])
 
-    return <span role="button" onDoubleClick={onDoubleClick} ref={katexRef} tabIndex={-1}>
-        </span>
-
+  return (
+    <span role='button' onDoubleClick={onDoubleClick} ref={katexRef} tabIndex={-1} />
+  )
 }
 
 export default KatexRenderer

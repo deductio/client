@@ -1,15 +1,15 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
-import { 
-    createCommand, TextFormatType, COMMAND_PRIORITY_EDITOR, COMMAND_PRIORITY_HIGH, 
-    $getSelection, $isRangeSelection, RangeSelection, $insertNodes
-} from "lexical"
-import { TRANSFORMERS, $convertToMarkdownString } from "@lexical/markdown"
-import { mergeRegister } from "@lexical/utils"
-import { useEffect } from "react"
-import { $createEquationNode } from "./EquationNode"
-import { $createCodeNode } from "@lexical/code"
-import { $createImageNode } from "./ImageNode"
-import { $createYoutubeNode } from "./YoutubeNode"
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import {
+  createCommand, TextFormatType, COMMAND_PRIORITY_EDITOR, COMMAND_PRIORITY_HIGH,
+  $getSelection, $isRangeSelection, RangeSelection, $insertNodes
+} from 'lexical'
+import { TRANSFORMERS, $convertToMarkdownString } from '@lexical/markdown'
+import { mergeRegister } from '@lexical/utils'
+import { useEffect } from 'react'
+import { $createEquationNode } from './EquationNode'
+import { $createCodeNode } from '@lexical/code'
+import { $createImageNode } from './ImageNode'
+import { $createYoutubeNode } from './YoutubeNode'
 
 export const FORMAT_TEXT_COMMAND = createCommand<TextFormatType>()
 
@@ -28,66 +28,60 @@ export const INSERT_YOUTUBE_COMMAND = createCommand<string>()
  * and toolbar interactions, such as importing markdown and formatting
  * text.
  */
-const CommandHandler = () => {
-    const [editor] = useLexicalComposerContext()
+const CommandHandler = (): null => {
+  const [editor] = useLexicalComposerContext()
 
-    useEffect(() => {
-        return mergeRegister(
-            editor.registerCommand(FORMAT_TEXT_COMMAND, type => {
+  useEffect(() => {
+    return mergeRegister(
+      editor.registerCommand(FORMAT_TEXT_COMMAND, type => {
+        const selection = $getSelection() as RangeSelection
 
-                const selection = $getSelection() as RangeSelection
-        
-                if ($isRangeSelection(selection)) {
-                    selection.formatText(type)
-                }
-        
-                return true
-            }, COMMAND_PRIORITY_EDITOR),
+        if ($isRangeSelection(selection)) {
+          selection.formatText(type)
+        }
 
-            editor.registerCommand(MARKDOWN_EXPORT, _ => {
+        return true
+      }, COMMAND_PRIORITY_EDITOR),
 
-                const markdown = $convertToMarkdownString(TRANSFORMERS)
+      editor.registerCommand(MARKDOWN_EXPORT, _ => {
+        const markdown = $convertToMarkdownString(TRANSFORMERS)
 
-                console.log(markdown)
-                
-                return true
-            }, COMMAND_PRIORITY_HIGH),
+        console.log(markdown)
 
-            editor.registerCommand(INSERT_MATH_COMMAND, () => {
+        return true
+      }, COMMAND_PRIORITY_HIGH),
 
-                const equation = $createEquationNode("x+1", false)
-                $insertNodes([equation])
+      editor.registerCommand(INSERT_MATH_COMMAND, () => {
+        const equation = $createEquationNode('x+1', false)
+        $insertNodes([equation])
 
-                return true
-            }, COMMAND_PRIORITY_EDITOR),
+        return true
+      }, COMMAND_PRIORITY_EDITOR),
 
-            editor.registerCommand(INSERT_CODE_BLOCK_COMMAND, () => {
+      editor.registerCommand(INSERT_CODE_BLOCK_COMMAND, () => {
+        const code = $createCodeNode()
+        $insertNodes([code])
 
-                const code = $createCodeNode()
-                $insertNodes([code])
+        return true
+      }, COMMAND_PRIORITY_EDITOR),
 
-                return true
-            }, COMMAND_PRIORITY_EDITOR),
+      editor.registerCommand(INSERT_IMAGE_COMMAND, link => {
+        const image = $createImageNode(link, 0)
+        $insertNodes([image])
 
-            editor.registerCommand(INSERT_IMAGE_COMMAND, link => {
-                const image = $createImageNode(link, 0)
-                $insertNodes([image])
+        return true
+      }, COMMAND_PRIORITY_EDITOR),
 
-                return true
-            }, COMMAND_PRIORITY_EDITOR),
+      editor.registerCommand(INSERT_YOUTUBE_COMMAND, id => {
+        const yt = $createYoutubeNode(id, undefined, undefined)
+        $insertNodes([yt])
 
-            editor.registerCommand(INSERT_YOUTUBE_COMMAND, id => {
-                const yt = $createYoutubeNode(id, undefined, undefined)
-                $insertNodes([yt])
+        return true
+      }, COMMAND_PRIORITY_EDITOR)
+    )
+  }, [editor])
 
-                return true
-                
-            }, COMMAND_PRIORITY_EDITOR)
-        )
-    }, [editor])
-
-
-    return null
+  return null
 }
 
 export default CommandHandler
