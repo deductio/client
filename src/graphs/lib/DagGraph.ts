@@ -7,9 +7,9 @@ import { GraphMap } from '../../utilities/model'
 interface SigmaData {
   x: number
   y: number
-  label: string
+  label: string | null
   size: number
-  description: string
+  description?: string
 }
 
 /**
@@ -40,7 +40,7 @@ export function drawRoundRect (
 }
 
 const drawHover = (context: CanvasRenderingContext2D, data: SigmaData, settings: { labelWeight: string, labelSize: number, labelFont: string }): void => {
-  if (data.label === undefined) return
+  if (data.label == null) return
 
   context.font = `${settings.labelWeight} ${settings.labelSize}px ${settings.labelFont}`
   const diameter = data.size * 2
@@ -51,7 +51,7 @@ const drawHover = (context: CanvasRenderingContext2D, data: SigmaData, settings:
   const maxWidth = Math.min(width - diameter, 200)
   // let actualMaxWidth = Math.min(width - diameter, 200)
   const descriptionLines: string[] = []
-  const descriptionWords: string[] = data.description.split(' ')
+  const descriptionWords: string[] = (data.description ?? '').split(' ')
   let currentLine = ''
   let currentWidth = 0
   let currentIndex = 0
@@ -161,7 +161,9 @@ const DagGraph = (props: DagGraphProps): null => {
     }
 
     if (props.selected !== undefined && props.selected.length === 2) {
-      if (!props.graph.requirements.some(req => req[0] === props.selected[0] && req[1] === props.selected[1])) {
+      const [src, dest] = props.selected
+
+      if (!props.graph.requirements.some(req => req[0] === src && req[1] === dest)) {
         graph.addEdge(props.selected[0], props.selected[1], {
           label: 'REL_1',
           type: 'arrow',

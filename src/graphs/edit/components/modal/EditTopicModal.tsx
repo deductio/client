@@ -53,12 +53,12 @@ const EditTopicModal = (props: EditTopicModalProps): JSX.Element => {
 
     case 'prereq':
       mainRef = objPrereqRef
-      body = props.topic !== null ? <ObjectiveSearch topic={props.topic} mode='prereq' fetcher={prereqFetcher} ref={mainRef} reconcile={() => setState('reconcile')} /> : <></>
+      body = props.topic !== null ? <ObjectiveSearch topic={props.topic} mode='prereq' fetcher={prereqFetcher} ref={mainRef} handleReconcile={() => setState('reconcile')} /> : <></>
       break
 
     case 'satis':
       mainRef = objSatisRef
-      body = props.topic !== null ? <ObjectiveSearch mode='satisfier' topic={props.topic} fetcher={prereqFetcher} ref={mainRef} reconcile={() => setState('topic')} /> : <></>
+      body = props.topic !== null ? <ObjectiveSearch mode='satisfier' topic={props.topic} fetcher={prereqFetcher} ref={mainRef} handleReconcile={() => setState('topic')} /> : <></>
       break
 
     case 'reconcile':

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+
 import { Params } from 'react-router-dom'
 
 /**
  * Represents a single node in a {@link KnowledgeGraph}.
  */
-export interface Topic {
+export type Topic = {
   knowledge_graph_id: string
   title: string
   id: number
@@ -24,7 +26,7 @@ export interface Requirement {
  * Represents an *objective*, or a requirement that isn't necessarily tied to any specific graph. Used
  * for creating requirements that may span across graphs.
  */
-export interface Objective {
+export type Objective = {
   id: number
   title: string
   description: string
@@ -44,7 +46,7 @@ export interface ResObjectiveSatisfier {
  * The main knowledge graph type - contains all information necessary to render (for viewing) and modify (for editing)
  * a user-created graph.
  */
-export interface KnowledgeGraph {
+export type KnowledgeGraph = {
   id: string
   name: string
   description: string
@@ -61,7 +63,7 @@ export interface KnowledgeGraph {
  * all intra-graph requirements are completed. To make learning map generation easier, an external graph (and topic within
  * the graph) are provided that satisfy the given objective, dictated by the creator of the current graph.
  */
-export interface ObjectivePrerequisite {
+export type ObjectivePrerequisite = {
   knowledge_graph_id: string
   topic: number
   objective: Objective
@@ -72,7 +74,7 @@ export interface ObjectivePrerequisite {
 /**
  * A struct that indicates a given topic (identified by its `id`) satisfies a given {@link Objective}.
  */
-export interface ObjectiveSatisfier {
+export type ObjectiveSatisfier = {
   topic: Topic
   objective: Objective
 }
@@ -92,7 +94,7 @@ export interface GraphMap {
  * A {@link PreviewGraph} along with a collection of topics, used for presenting search results when
  * finding graphs and topics that satisfy a given objective.
  */
-export interface PGTopicPair {
+export type PGTopicPair = {
   graph: PreviewGraph
   topics: Topic[]
 }
@@ -133,7 +135,7 @@ export interface SearchResultGraph {
  *
  * @see module:deductio/modify_graph
  */
-export interface PreviewGraph {
+export type PreviewGraph = {
   id: string
   name: string
   description: string
