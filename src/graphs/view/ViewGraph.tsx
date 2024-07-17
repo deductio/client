@@ -10,7 +10,6 @@ import GraphViewEvents from './lib/GraphViewEvents'
 import ViewReducer from './lib/ViewReducer'
 import { useViewGraph } from './lib/ViewState'
 import LockedTopicModal from './components/LockedTopicModal'
-import PlanList from './components/PlanList'
 
 const isAvailable = (node: number, progress: number[], requirements: Array<[number, number]>): boolean =>
   requirements.filter(req => req[1] === node).every(req => progress.includes(req[0]))
@@ -49,7 +48,7 @@ const ViewGraph = (): JSX.Element => {
         <GraphViewEvents clickTopic={openTopic} />
         <ViewReducer progress={progress} />
         <ControlsContainer position='top-right' className='w-1/5'>
-          <PlanList topics={graph.topics} />
+          {/* <PlanList topics={graph.topics} /> */}
         </ControlsContainer>
       </SigmaContainer>
 

@@ -11,14 +11,16 @@ import searchRoutes from './search_graph/routes'
 import userRoutes from './user_profile/routes'
 import mapRoutes from './user_maps/routes'
 import modifyRoutes from './modify_graph/routes'
+import ViewGraph from './graphs/view/ViewGraph'
 
 const MAIN_GRAPH = '00000000-0000-0000-0000-000000000000'
 
 const routes = [
   {
     path: '',
+    element: <ViewGraph />,
     loader: async () => {
-      return await fetch('/graph/view/' + MAIN_GRAPH).then(async res => await res.json())
+      return await fetch('/api/graph/view/' + MAIN_GRAPH).then(async res => await res.json())
     }
   },
   ...viewRoutes,
